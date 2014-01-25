@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=4.0, user-scalable=yes, width=device-width" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<title>Concerto MusicXML Parser Demo</title>
+
+<link href='./../lib/bootstrap/bootstrap.min.css' rel='stylesheet' type='text/css'>
+<link href='./../lib/bootstrap/bootstrap-theme.min.css' rel='stylesheet' type='text/css'>
+
+<script type="text/javascript" src="./../lib/jquery-2.0.2.min.js"></script>
+<script type="text/javascript" src="./../lib/raphael-min.js"></script>
+<script type="text/javascript" src="./../lib/vexflow-min.js"></script>
+
+<script type="text/javascript" src="./templates.js"></script>
+
+<script type="text/javascript" src="./../src/concerto.js"></script>
+<script type="text/javascript" src="./../src/table.js"></script>
+<script type="text/javascript" src="./../src/parser.js"></script>
+
+<script type="text/javascript">
+var musicjson;
+
+function onReady() {
+	var pageLayout = templates['sonata16']['defaults']['page-layout'];
+	$("#content").css('width', pageLayout['page-width'])
+				 .css('height', pageLayout['page-height']);
+	$("#content").find('svg').remove();
+    var canvas = document.getElementById("content");
+    var renderer = new Vex.Flow.Renderer("content", Vex.Flow.Renderer.Backends.RAPHAEL);
+    var ctx = renderer.getContext();
+
+	var pages = [
+		ctx, undefined
+	];
+
+	musicjson = Concerto.Parser.parseAndDraw(pages, templates['sonata16']);	
+}
+
+$(document).ready(function() { onReady(); });
+
+</script>
+</head>
+<body style="text-align:center;">
+	<div id="content" style="width:300px;height:600px;background-color:#eed;margin:auto;">
+	</div>
+</body>
+</html>
