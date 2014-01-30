@@ -10,33 +10,47 @@
 <link href='./../lib/bootstrap/bootstrap.min.css' rel='stylesheet' type='text/css'>
 <link href='./../lib/bootstrap/bootstrap-theme.min.css' rel='stylesheet' type='text/css'>
 
-<script type="text/javascript" src="./../lib/jquery-2.0.2.min.js"></script>
 <script type="text/javascript" src="./../lib/raphael-min.js"></script>
 <script type="text/javascript" src="./../lib/vexflow-min.js"></script>
+<script type="text/javascript" src="./../lib/jquery-2.0.2.min.js"></script>
 
 <script type="text/javascript" src="./templates.js"></script>
 
 <script type="text/javascript" src="./../src/concerto.js"></script>
 <script type="text/javascript" src="./../src/table.js"></script>
 <script type="text/javascript" src="./../src/parser.js"></script>
+<script type="text/javascript" src="./../src/converter.js"></script>
 
 <script type="text/javascript">
 var musicjson;
 
 function onReady() {
-	var pageLayout = templates['sonata16']['defaults']['page-layout'];
-	$("#content").css('width', pageLayout['page-width'])
-				 .css('height', pageLayout['page-height']);
-	$("#content").find('svg').remove();
-    var canvas = document.getElementById("content");
-    var renderer = new Vex.Flow.Renderer("content", Vex.Flow.Renderer.Backends.RAPHAEL);
-    var ctx = renderer.getContext();
+    // use xml example instead of using templates.js
+    $.ajax({
+        url: './examples/scales.xml',
+        data: null,
+        success: function( data ) {
+            musicjson = Concerto.Converter.toJSON(data);
+            //musicjson = templates['sonata16'];
+            console.log(musicjson);
+            var pageLayout = musicjson['defaults']['page-layout'];
+            $("#content").css('width', pageLayout['page-width'])
+                         .css('height', pageLayout['page-height']);
+            $("#content").find('svg').remove();
+            var canvas = document.getElementById("content");
+            var renderer = new Vex.Flow.Renderer("content", Vex.Flow.Renderer.Backends.RAPHAEL);
+            var ctx = renderer.getContext();
 
-	var pages = [
-		ctx, undefined
-	];
+            var pages = [
+                ctx, undefined
+            ];
 
-	musicjson = Concerto.Parser.parseAndDraw(pages, templates['sonata16']);	
+            musicjson = Concerto.Parser.parseAndDraw(pages, musicjson); 
+
+        },
+        dataType: 'xml'
+    });
+    
 }
 
 $(document).ready(function() { onReady(); });
@@ -44,7 +58,7 @@ $(document).ready(function() { onReady(); });
 </script>
 </head>
 <body style="text-align:center;">
-	<div id="content" style="width:300px;height:600px;background-color:#eed;margin:auto;">
-	</div>
+    <div id="content" style="width:300px;height:600px;background-color:#eed;margin:auto;">
+    </div>
 </body>
 </html>
