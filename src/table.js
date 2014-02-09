@@ -28,6 +28,7 @@ Concerto.Table.NOTE_TYPES = ['1024th', '512th', '256th', '128th',
     '64th', '32nd', '16th', 'eighth', 'quarter', 'half', 'whole', 'breve',
     'long', 'maxima'];
 
+Concerto.Table.NOTE_VEX_QUARTER_INDEX = 8;
 Concerto.Table.NOTE_VEX_TYPES = ['64', '64', '64', '128',
     '64', '32', '16', '8', 'q', 'h', 'w', 'w',
     'w', 'w'];

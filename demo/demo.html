@@ -19,30 +19,46 @@
 <script type="text/javascript" src="./../src/concerto.js"></script>
 <script type="text/javascript" src="./../src/table.js"></script>
 <script type="text/javascript" src="./../src/parser.js"></script>
+<script type="text/javascript" src="./../src/notemanager.js"></script>
 <script type="text/javascript" src="./../src/converter.js"></script>
 
 <script type="text/javascript">
 var musicjson;
 
+var examples = [
+    './examples/scales.xml',
+    './examples/sonata16.xml', // x
+    './examples/adeste.xml',
+    './examples/inv4.xml',
+    './examples/inv1.xml',
+    './examples/PlanxtyCarolan.xml' // x
+
+];
+
 function onReady() {
     // use xml example instead of using templates.js
     $.ajax({
-        url: './examples/scales.xml',
+        url: examples[5],
         data: null,
         success: function( data ) {
             musicjson = Concerto.Converter.toJSON(data);
-            //musicjson = templates['sonata16'];
             console.log(musicjson);
             var pageLayout = musicjson['defaults']['page-layout'];
             $("#content").css('width', pageLayout['page-width'])
                          .css('height', pageLayout['page-height']);
             $("#content").find('svg').remove();
-            var canvas = document.getElementById("content");
+
+            $("#content2").css('width', pageLayout['page-width'])
+                         .css('height', pageLayout['page-height']);
+            $("#content2").find('svg').remove();
             var renderer = new Vex.Flow.Renderer("content", Vex.Flow.Renderer.Backends.RAPHAEL);
             var ctx = renderer.getContext();
 
+            var renderer = new Vex.Flow.Renderer("content2", Vex.Flow.Renderer.Backends.RAPHAEL);
+            var ctx2 = renderer.getContext();
+
             var pages = [
-                ctx, undefined
+                ctx, ctx2, undefined, undefined, undefined
             ];
 
             musicjson = Concerto.Parser.parseAndDraw(pages, musicjson); 
@@ -59,6 +75,9 @@ $(document).ready(function() { onReady(); });
 </head>
 <body style="text-align:center;">
     <div id="content" style="width:300px;height:600px;background-color:#eed;margin:auto;">
+    </div>
+    <div style="height:30px;"></div>
+    <div id="content2" style="width:300px;height:600px;background-color:#eed;margin:auto;">
     </div>
 </body>
 </html>

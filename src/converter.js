@@ -125,12 +125,13 @@ Concerto.Converter.getPrintTag = function($print) {
         }
         print['system-layout'] = systemLayout;
     }
-    else if( $print.find('staff-layout').length > 0 ) {
+    
+    if( $print.find('staff-layout').length > 0 ) {
         // musicxml xsd says staff-layout maxOccurs is unbounded. 
         // but I haven't found this case which multiple staff-layout occurs in an one print tag.
         var $staffLayout = $print.find('staff-layout');
         var staffLayout = {
-            '@number': $staffLayout.attr('number'),
+            '@number': parseInt( $staffLayout.attr('number') ),
             'staff-distance': parseFloat( $staffLayout.find('staff-distance').text() )
         };
         print['staff-layout'] = staffLayout;
@@ -148,22 +149,37 @@ Concerto.Converter.getAttributesTag = function($attributes) {
         attributes['divisions'] = parseInt( $divisions.text() );
     }
 
+    var $staves = $attributes.find('staves');
+    if( $staves.length > 0 ) {
+        attributes['staves'] = parseInt( $staves.text() );
+    }
+
     var $clef = $attributes.find('clef');
     if( $clef.length > 0 ) {
-        attributes['clef'] = {
-            'sign': $clef.find('sign').text(),
-            'line': parseInt( $clef.find('line').text() )
-        };
+        var clefs = [];
+        $clef.each(function() {
+            var clef = {
+                'sign': $(this).find('sign').text(),
+                'line': parseInt( $(this).find('line').text() )
+            };
+            if( $(this).attr('number') ) {
+                clef['@number'] = parseInt( $(this).attr('number') );
+            }
+            clefs.push(clef);
+        });
+        if(clefs.length > 0) {
+            attributes['clef'] = clefs;
+        }
     }
 
     var $time = $attributes.find('time');
     if( $time.length > 0 ) {
         attributes['time'] = {
             'beats': parseInt( $time.find('beats').text() ),
-            'beat-type': parseInt($time.find('beat-type').text())
+            'beat-type': parseInt( $time.find('beat-type').text() )
         };
         if( $time.attr('symbol') ) {
-            attributes['@symbol'] = $time.attr('symbol');
+            attributes['time']['@symbol'] = $time.attr('symbol');
         }
     }
 
@@ -186,7 +202,9 @@ Concerto.Converter.getNoteTag = function($note) {
     };
 
     note['duration'] = parseInt( $note.find('duration').text() );
-    note['type'] = $note.find('type').text();
+    if( $note.find('type').length > 0 ) {
+        note['type'] = $note.find('type').text();    
+    }
 
     var $accidental = $note.find('accidental');
     if( $accidental.length > 0 ) {
@@ -290,7 +308,7 @@ Concerto.Converter.getPart = function( $xml ) {
                 else if(tagName == 'note') {
                     measure['note'].push( Concerto.Converter.getNoteTag( $(this) ) );
                 }
-                else if(tagName == 'backward' || tagName == 'forward') {
+                else if(tagName == 'backup' || tagName == 'forward') {
                     measure['note'].push( Concerto.Converter.getForwardAndBackupTag( $(this) ) );
                 }
                 else {

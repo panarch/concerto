@@ -24,8 +24,8 @@ Concerto.Parser.getPageMargins = function(pageIndex, defaults) {
 
     var pageType = (pageIndex % 2 == 0) ? 'odd' : 'even';
     for(var i = 0; i < pageLayout['page-margins'].length; i++) {
-        if(pageLayout['page-margins']['@type'] == pageType) {
-            return pageLayout['page-margins'];
+        if(pageLayout['page-margins'][i]['@type'] == pageType) {
+            return pageLayout['page-margins'][i];
         }
     }
 
@@ -44,14 +44,20 @@ Concerto.Parser.getStave = function(measure, leftMeasure, aboveMeasure, pageMarg
         var print = measure['print'];
         measure['x'] = pageMargins['left-margin'];
         if(print['system-layout']) {
-            if(print['system-layout']['top-system-distance'] != undefined) {
+            var systemLayout = print['system-layout'];
+            if(systemLayout['system-margins'] && 
+                systemLayout['system-margins']['left-margin']) {
+                measure['x'] += systemLayout['system-margins']['left-margin'];
+            }
+
+            if(systemLayout['top-system-distance'] != undefined) {
                 // new page
                 var topMargin = pageMargins['top-margin'];
-                measure['y'] = topMargin + print['system-layout']['top-system-distance'];
+                measure['y'] = topMargin + systemLayout['top-system-distance'];
             }
-            else if(print['system-layout']['system-distance'] != undefined) {
+            else if(systemLayout['system-distance'] != undefined) {
                 // new system
-                measure['y'] = aboveMeasure['bottom-line-y'] + print['system-layout']['system-distance'];
+                measure['y'] = aboveMeasure['bottom-line-y'] + systemLayout['system-distance'];
             }
             else {
 
@@ -65,12 +71,30 @@ Concerto.Parser.getStave = function(measure, leftMeasure, aboveMeasure, pageMarg
             Concerto.logError('lack of print tag');
         }
     }
-    
-    var stave = new Vex.Flow.Stave(measure['x'], measure['y'], measure['width']);
+
+    var options = {
+        'space_above_staff_ln': 0
+    };
+    var stave = new Vex.Flow.Stave(measure['x'], measure['y'], measure['width'], options);
     return stave;
 }
 
-Concerto.Parser.getLeftMeausre = function(partIndex, measureIndex, measure, musicjson) {
+Concerto.Parser.getAdditionalStave = function(measure, firstMeasure) {
+    var print = firstMeasure['print'];
+
+    if(print['staff-layout'] && print['staff-layout']['@number'] == 2) {
+        var y = measure['y'] + 40 + print['staff-layout']['staff-distance'];
+        var options = {
+            'space_above_staff_ln': 0
+        };
+        var stave = new Vex.Flow.Stave(measure['x'], y, measure['width'], options);
+        
+        return stave;
+    }
+    return undefined;
+}
+
+Concerto.Parser.getLeftMeasure = function(partIndex, measureIndex, measure, musicjson) {
     if(measure['print'] && 
         (measure['print']['@new-page'] || measure['print']['@new-system'])) {
         return undefined;
@@ -92,20 +116,44 @@ Concerto.Parser.getAboveMeasure = function(partIndex, measureIndex, firstMeasure
     return musicjson['part'][partIndex - 1]['measure'][measureIndex];
 }
 
-Concerto.Parser.addClefInfo = function(stave, clefSign) {
-    var clef = undefined;
-    if(clefSign == 'G') {
-        clef = 'treble';
-        stave.addClef(clef);
+Concerto.Parser.addClefInfo = function(staves, curClefs, clefList) {
+    var clefs = [];
+    
+    for(var i = 0; i < staves.length; i++) {
+        var stave = staves[i];
+        var number = i + 1;
+
+        var clefDict = undefined;//clefList[i];
+        for(var j = 0; j < clefList.length; j++) {
+            if(clefList[j]['@number'] == number ||
+                clefList[j]['@number'] == undefined) {
+                clefDict = clefList[j];
+                break;
+            }
+        }
+        if(clefDict == undefined) {
+            clefs.push(curClefs[i]);
+            continue;
+        }
+
+        var clefSign = clefDict['sign'];
+        if(clefSign == 'G') {
+            var clef = 'treble';
+            clefs.push(clef);
+            stave.addClef(clef);
+        }
+        else if(clefSign == 'F') {
+            var clef = 'bass';
+            clefs.push(clef);
+            stave.addClef('bass');
+        }
+        else {
+            Concerto.logError('Unsupported clef sign: ' + clefSign);
+        }
     }
-    else if(clefSign == 'F') {
-        clef = 'bass';
-        stave.addClef('bass');
-    }
-    else {
-        Concerto.logError('Unsupported clef sign: ' + clefSign);
-    }
-    return clef;
+
+    
+    return clefs;
 }
 
 
@@ -145,17 +193,65 @@ Concerto.Parser.addTimeSignatureInfo = function(stave, timeDict) {
         }
     }
     else {
-        timeSpec = currentTimeBeats + '/' + currentTimeBeatType;
+        timeSpec = timeDict['beats'] + '/' + timeDict['beat-type'];
     }
     stave.addTimeSignature(timeSpec);
 }
 
-Concerto.Parser.getStaveNote = function(notes, clef) {    
+Concerto.Parser.getStaveNoteTypeFromDuration = function(duration, divisions, withDots) {
+    if(withDots == undefined) {
+        withDots = false;
+    }
+
+    var i = Concerto.Table.NOTE_VEX_QUARTER_INDEX;
+    for(var count = 0; count < 20; count++) {
+        var num = Math.floor(duration / divisions);
+        if(num == 1) {
+            break;
+        }
+        else if(num > 1) {
+            divisions *= 2;
+            i++;
+        }
+        else {
+            divisions /= 2;
+            i--;
+        }
+    }
+    if(count == 20) {
+        Concerto.logError('No proper StaveNote type');
+    }
+
+    var noteType = Concerto.Table.NOTE_VEX_TYPES[i];
+    if(withDots) {
+        for(var count = 0; count < 5; count++) {
+            duration -= Math.floor(duration / divisions);
+            divisions /= 2;
+            var num = Math.floor(duration / divisions);
+            if(num == 1) {
+                noteType += 'd';
+            }
+            else {
+                break;
+            }
+        }
+    }
+
+    return noteType;
+}
+
+Concerto.Parser.getStaveNote = function(notes, clef, divisions) {    
     var keys = [];
     var accidentals = [];
     var baseNote = notes[0];
-    var duration = Concerto.Table.NOTE_TYPE_DICT[baseNote['type']];
-
+    var duration;
+    if(baseNote['type'] != undefined) {
+        duration = Concerto.Table.NOTE_TYPE_DICT[baseNote['type']];
+    }
+    else {
+        duration = Concerto.Parser.getStaveNoteTypeFromDuration(baseNote['duration'], divisions);
+    }
+    
     if(notes.length == 1 && baseNote['rest']) {
         duration += 'r';
         keys.push( Concerto.Table.DEFAULT_REST_PITCH );
@@ -230,14 +326,24 @@ Concerto.Parser.getBeams = function(notes) {
     return beams;
 }
 
+Concerto.Parser.drawVoices = function(voices, ctx) {
+    for(var i = 0; i < voices.length; i++) {
+        var voice = voices[i][0];
+        var stave = voices[i][1];
+        var formatter = new Vex.Flow.Formatter();
+        //formatter.joinVoices([voice]);
+        //formatter.formatToStave([voice], stave);
+        voice.draw(ctx, stave);
+    }
+}
 
 Concerto.Parser.parseAndDraw = function(pages, musicjson) {
     var parts = musicjson['part'];
     
     // Currently, only supports G, F clefs.
-    var curClefs = new Array(parts.length); 
+    var curClefsList = new Array(parts.length); 
     for(var p = 0; p < parts.length; p++) {
-        curClefs[p] = Concerto.Table.DEFAULT_CLEF;
+        curClefsList[p] = [ Concerto.Table.DEFAULT_CLEF ];
     }
 
     var curTimeBeats = Concerto.Table.DEFAULT_TIME_BEATS;
@@ -252,39 +358,52 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
     var voices;
     var beams;
     var curPageIndex = 0;
+    var divisions = 1;
+    var ctx = pages[curPageIndex];
 
     for(var i = 0; i < numMeasures; i++) {
         staves = [];
-        voices = [];
         beams = [];
+        voices = [];
         for(var p = 0; p < parts.length; p++) {
             var measure = parts[p]['measure'][i];
-            
             if(measure['print']) {
                 firstMeasures[p] = measure;
                 if(measure['print']['@new-page']) {
                     curPageIndex++;
+                    ctx = pages[curPageIndex];
                 }
             }
-
-            var leftMeasure = Concerto.Parser.getLeftMeausre(p, i, measure, musicjson);
-            var aboveMeasure = Concerto.Parser.getAboveMeasure(p, i, firstMeasures[p], musicjson);
             
+            var firstMeasure = firstMeasures[p];
+
+            var leftMeasure = Concerto.Parser.getLeftMeasure(p, i, measure, musicjson);
+            var aboveMeasure = Concerto.Parser.getAboveMeasure(p, i, firstMeasure, musicjson);
             var pageMargins = Concerto.Parser.getPageMargins(curPageIndex, musicjson['defaults']);
+
             var stave = Concerto.Parser.getStave(measure, leftMeasure, aboveMeasure, pageMargins);
+            
+            var stave2 = Concerto.Parser.getAdditionalStave(measure, firstMeasure);
+            var curStaves = [stave];
             staves.push(stave);
+
+            if(stave2 != undefined) {
+                curStaves.push(stave2);
+                staves.push(stave2);
+            }
             measure['stave'] = stave;
+            measure['stave2'] = stave2;
+            var staveNotesDict = {};
 
             // check clef, time signature changes
             var notes = measure['note'];
-            var staveNotes = [];
-
+            var noteManager = new Concerto.Parser.NoteManager(curTimeBeats, curTimeBeatType, divisions);
             for(var j = 0; j < notes.length; j++) {
                 var note = notes[j];
                 // backup, forward
                 if(note['tag'] == 'attributes') {
                     if(note['clef']) {
-                        curClefs[p] = Concerto.Parser.addClefInfo(stave, note['clef']['sign']);
+                        curClefsList[p] = Concerto.Parser.addClefInfo(curStaves, curClefsList[p], note['clef']);
                     }
 
                     if(note['key']) {
@@ -295,6 +414,10 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                         curTimeBeats = note['time']['beats'];
                         curTimeBeatType = note['time']['beat-type'];
                         Concerto.Parser.addTimeSignatureInfo(stave, note['time']);
+                    }
+
+                    if(note['divisions']) {
+                        divisions = note['divisions'];
                     }
                 }
                 else if(note['tag'] == 'note') {
@@ -310,59 +433,58 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                         chordNotes.push(nextNote);
                     }
                     
-                    var staveNote = Concerto.Parser.getStaveNote(chordNotes, curClefs[p]);
-                    staveNotes.push(staveNote);
+                    
+
+                    if(note['staff'] && note['staff'] == 2) {
+                        var staveNote = Concerto.Parser.getStaveNote(chordNotes, curClefsList[p][1], divisions);
+                        noteManager.addStaveNote(staveNote, note);
+                    }
+                    else {
+                        var staveNote = Concerto.Parser.getStaveNote(chordNotes, curClefsList[p][0], divisions);
+                        noteManager.addStaveNote(staveNote, note);
+                    }
+                    
                     note['staveNote'] = staveNote;
+
                 }
                 else if(note['tag'] == 'backup') {
-                    
+                    noteManager.addBackup(note['duration']);
                 }
                 else if(note['tag'] == 'forward') {
-
+                    noteManager.addForward(note['duration']);
                 }
             }
 
-            beams = beams.concat( Concerto.Parser.getBeams(notes) );
+            var newBeams = Concerto.Parser.getBeams(notes);
+            beams = beams.concat(newBeams);
 
-            var voice = new Vex.Flow.Voice({ num_beats: curTimeBeats, 
-                                            beat_value: curTimeBeatType,
-                                            resolution: Vex.Flow.RESOLUTION});
-            voice.setMode(Vex.Flow.Voice.Mode.SOFT);
-            voice = voice.addTickables(staveNotes);
-            voices.push(voice);
+            var newVoices = noteManager.getVoices(curStaves);
+            voices = voices.concat(newVoices);
 
             // draw stave
-            if(!pages[curPageIndex]) {
+            if(ctx == undefined) {
                 continue;
             }
-
-            var ctx = pages[curPageIndex];
-
-            // draw stave
+            
             stave.setContext(ctx).draw();
             measure['top-line-y'] = stave.getYForLine(0);
-            measure['bottom-line-y'] = stave.getYForLine(stave.options.num_lines - 1);
             measure['top-y'] = stave.y;
+            measure['bottom-line-y'] = stave.getYForLine(stave.options.num_lines - 1);
             measure['bottom-y'] = stave.getBottomY();
-
-        }
-
-        // does vexflow not support multiple part formatting?
-        // var formatter = new Vex.Flow.Formatter().joinVoices(voices).formatToStave(voices, staves[0]);
-        
-        for(var p = 0; p < parts.length; p++) {
-            if(!pages[curPageIndex]) {
-                continue;
+            if(stave2) {
+                //stave2.y = measure['bottom-line-y'] + measure['print']['staff-layout']['staff-distance'];
+                stave2.setContext(ctx).draw();
+                measure['bottom-line-y'] = stave2.getYForLine(stave2.options.num_lines - 1);
+                measure['bottom-y'] = stave2.getBottomY();
             }
-
-            var ctx = pages[curPageIndex];
-
-        
-            var formatter = new Vex.Flow.Formatter().joinVoices([voices[p]]).formatToStave([voices[p]], staves[p]);
-            // draw notes
-            voices[p].draw(ctx, staves[p]);
-
         }
+
+        if(ctx == undefined) {
+            continue;
+        }
+        
+        // does vexflow not support multiple part formatting?
+        Concerto.Parser.drawVoices(voices, ctx);
 
         for(var j = 0; j < beams.length; j++) {
             beams[j].setContext(ctx).draw();
@@ -371,7 +493,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
         // draw stave connector
         // current version, multiple staff and connector shape are not supported.
         if(parts[0]['measure'][i]['print']) {
-            var staveConnector = new Vex.Flow.StaveConnector(staves[0], staves[parts.length - 1]);
+            var staveConnector = new Vex.Flow.StaveConnector(staves[0], staves[staves.length - 1]);
             staveConnector.setContext(ctx);
             staveConnector.setType(Vex.Flow.StaveConnector.type.BRACE);
             staveConnector.draw();
