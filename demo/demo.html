@@ -19,6 +19,7 @@
 <script type="text/javascript" src="./../src/concerto.js"></script>
 <script type="text/javascript" src="./../src/table.js"></script>
 <script type="text/javascript" src="./../src/parser.js"></script>
+<script type="text/javascript" src="./../src/attributesmanager.js"></script>
 <script type="text/javascript" src="./../src/notemanager.js"></script>
 <script type="text/javascript" src="./../src/converter.js"></script>
 
@@ -38,7 +39,7 @@ var examples = [
 function onReady() {
     // use xml example instead of using templates.js
     $.ajax({
-        url: examples[5],
+        url: examples[3],
         data: null,
         success: function( data ) {
             musicjson = Concerto.Converter.toJSON(data);

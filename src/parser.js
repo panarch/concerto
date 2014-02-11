@@ -116,47 +116,6 @@ Concerto.Parser.getAboveMeasure = function(partIndex, measureIndex, firstMeasure
     return musicjson['part'][partIndex - 1]['measure'][measureIndex];
 }
 
-Concerto.Parser.addClefInfo = function(staves, curClefs, clefList) {
-    var clefs = [];
-    
-    for(var i = 0; i < staves.length; i++) {
-        var stave = staves[i];
-        var number = i + 1;
-
-        var clefDict = undefined;//clefList[i];
-        for(var j = 0; j < clefList.length; j++) {
-            if(clefList[j]['@number'] == number ||
-                clefList[j]['@number'] == undefined) {
-                clefDict = clefList[j];
-                break;
-            }
-        }
-        if(clefDict == undefined) {
-            clefs.push(curClefs[i]);
-            continue;
-        }
-
-        var clefSign = clefDict['sign'];
-        if(clefSign == 'G') {
-            var clef = 'treble';
-            clefs.push(clef);
-            stave.addClef(clef);
-        }
-        else if(clefSign == 'F') {
-            var clef = 'bass';
-            clefs.push(clef);
-            stave.addClef('bass');
-        }
-        else {
-            Concerto.logError('Unsupported clef sign: ' + clefSign);
-        }
-    }
-
-    
-    return clefs;
-}
-
-
 Concerto.Parser.addKeySignatureInfo = function(stave, keyDict) {
     if(keyDict['fifths'] == undefined) {
         Concerto.logError('key fifths does not exists');
@@ -339,16 +298,9 @@ Concerto.Parser.drawVoices = function(voices, ctx) {
 
 Concerto.Parser.parseAndDraw = function(pages, musicjson) {
     var parts = musicjson['part'];
+
+    var attributesManager = new Concerto.Parser.AttributesManager();
     
-    // Currently, only supports G, F clefs.
-    var curClefsList = new Array(parts.length); 
-    for(var p = 0; p < parts.length; p++) {
-        curClefsList[p] = [ Concerto.Table.DEFAULT_CLEF ];
-    }
-
-    var curTimeBeats = Concerto.Table.DEFAULT_TIME_BEATS;
-    var curTimeBeatType = Concerto.Table.DEFAULT_TIME_BEAT_TYPE;
-
     var numMeasures = parts[0]['measure'].length;
     
     // first measure on same line.
@@ -367,8 +319,10 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
         voices = [];
         for(var p = 0; p < parts.length; p++) {
             var measure = parts[p]['measure'][i];
+            // measure['print'] exists mean that measure is first measure on the same line.
             if(measure['print']) {
                 firstMeasures[p] = measure;
+
                 if(measure['print']['@new-page']) {
                     curPageIndex++;
                     ctx = pages[curPageIndex];
@@ -397,27 +351,58 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
 
             // check clef, time signature changes
             var notes = measure['note'];
-            var noteManager = new Concerto.Parser.NoteManager(curTimeBeats, curTimeBeatType, divisions);
+            var noteManager = new Concerto.Parser.NoteManager(attributesManager);
+            
+            if(notes.length > 0) {
+                var note = notes[0];
+                var isAttributes = (note['tag'] == 'attributes');
+                var clefExists = false;
+                if(isAttributes && note['clef']) {
+                    // set raw clefs, and get converted clef
+                    attributesManager.setClefs(note['clef'], p);
+                    clefExists = true;
+                }
+                
+                if(measure['print'] || clefExists) {
+                    for(var k = 0; k < curStaves.length; k++) {
+                        var staff = k + 1;
+                        var clef = attributesManager.getClef(p, staff);
+                        if(clef != undefined) {
+                            curStaves[k].addClef(clef);
+                        }
+                    }
+                }
+
+                if(isAttributes && note['key']) {
+                    attributesManager.setKeySignature(note['key'], p, note['staff']);
+                    Concerto.Parser.addKeySignatureInfo(stave, note['key']);
+                    if(stave2) {
+                        Concerto.Parser.addKeySignatureInfo(stave2, note['key']);
+                    }
+                }
+
+                if(isAttributes && note['time']) {
+                    attributesManager.setTimeSignature(note['time']);
+                    Concerto.Parser.addTimeSignatureInfo(stave, note['time']);
+                    if(stave2) {
+                        Concerto.Parser.addTimeSignatureInfo(stave2, note['time']);
+                    }
+                }
+
+                if(isAttributes && note['divisions']) {
+                    attributesManager.setDivisions(note['divisions']);
+                    divisions = note['divisions'];
+                }    
+            }
+
             for(var j = 0; j < notes.length; j++) {
                 var note = notes[j];
                 // backup, forward
-                if(note['tag'] == 'attributes') {
+                if(j > 0 && note['tag'] == 'attributes') {
+                    // clef change,
                     if(note['clef']) {
-                        curClefsList[p] = Concerto.Parser.addClefInfo(curStaves, curClefsList[p], note['clef']);
-                    }
-
-                    if(note['key']) {
-                        Concerto.Parser.addKeySignatureInfo(stave, note['key']);
-                    }
-
-                    if(note['time']) {
-                        curTimeBeats = note['time']['beats'];
-                        curTimeBeatType = note['time']['beat-type'];
-                        Concerto.Parser.addTimeSignatureInfo(stave, note['time']);
-                    }
-
-                    if(note['divisions']) {
-                        divisions = note['divisions'];
+                        attributesManager.setClefs(note['clef'], p);
+                        Concerto.logError('Clef change in middle of notes is unimplemented.');
                     }
                 }
                 else if(note['tag'] == 'note') {
@@ -434,13 +419,15 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                     }
                     
                     
-
+                    var clef = attributesManager.getClef(p, note['staff'], Concerto.Table.DEFAULT_CLEF);
                     if(note['staff'] && note['staff'] == 2) {
-                        var staveNote = Concerto.Parser.getStaveNote(chordNotes, curClefsList[p][1], divisions);
+                        //var staveNote = Concerto.Parser.getStaveNote(chordNotes, curClefsList[p][1], divisions);
+                        var staveNote = Concerto.Parser.getStaveNote(chordNotes, clef, divisions);
                         noteManager.addStaveNote(staveNote, note);
                     }
                     else {
-                        var staveNote = Concerto.Parser.getStaveNote(chordNotes, curClefsList[p][0], divisions);
+                        var staveNote = Concerto.Parser.getStaveNote(chordNotes, clef, divisions);
+                        //var staveNote = Concerto.Parser.getStaveNote(chordNotes, curClefsList[p][0], divisions);
                         noteManager.addStaveNote(staveNote, note);
                     }
                     
@@ -455,6 +442,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                 }
             }
 
+            
             var newBeams = Concerto.Parser.getBeams(notes);
             beams = beams.concat(newBeams);
 

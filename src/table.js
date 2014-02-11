@@ -54,4 +54,7 @@ Concerto.Table.NOTE_VEX_TYPE_DICT = {
 
 };
 
-
+Concerto.Table.CLEF_TYPE_DICT = {
+    'G': 'treble',
+    'F': 'bass'
+};
