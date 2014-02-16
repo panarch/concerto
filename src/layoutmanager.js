@@ -13,6 +13,7 @@ Concerto.Parser.LayoutManager = function(musicjson) {
 	this.page = 1;
 	this.parts = musicjson['part'];
 	this.pageLayout = musicjson['defaults']['page-layout'];
+	this.leftMargin = 0;
 };
 
 /**
@@ -76,7 +77,10 @@ Concerto.Parser.LayoutManager.prototype.getStavePositions = function(measure, le
             var systemLayout = print['system-layout'];
             if(systemLayout['system-margins'] && 
                 systemLayout['system-margins']['left-margin']) {
-                measure['x'] += systemLayout['system-margins']['left-margin'];
+            	this.leftMargin = systemLayout['system-margins']['left-margin'];
+            }
+            else {
+            	this.leftMargin = 0;
             }
 
             if(systemLayout['top-system-distance'] != undefined) {
@@ -99,6 +103,8 @@ Concerto.Parser.LayoutManager.prototype.getStavePositions = function(measure, le
         else {
             Concerto.logError('Lack of print tag');
         }
+
+        measure['x'] += this.leftMargin;
         var position = {
         	'x': measure['x'],
         	'y': measure['y']
