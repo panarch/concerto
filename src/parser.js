@@ -12,88 +12,6 @@ Concerto.Parser = {};
  Current verison only supports single staff, single voice.
 */
 
-Concerto.Parser.getPageMargins = function(pageIndex, defaults) {
-    var pageLayout = defaults['page-layout'];
-    if(Array.isArray(pageLayout['page-margins']) == false) {
-        return pageLayout['page-margins'];
-    }
-    else if(pageLayout['page-margins'].length == 1) {
-        // both
-        return pageLayout['page-margins'][0];
-    }
-
-    var pageType = (pageIndex % 2 == 0) ? 'odd' : 'even';
-    for(var i = 0; i < pageLayout['page-margins'].length; i++) {
-        if(pageLayout['page-margins'][i]['@type'] == pageType) {
-            return pageLayout['page-margins'][i];
-        }
-    }
-
-    Concerto.logError('page-margins required');
-    
-    // return default page margin
-    return {}
-}
-
-Concerto.Parser.getStave = function(measure, leftMeasure, aboveMeasure, pageMargins) {
-    if(leftMeasure) {
-        measure['y'] = leftMeasure['y'];
-        measure['x'] = leftMeasure['x'] + leftMeasure['width'];
-    }
-    else {
-        var print = measure['print'];
-        measure['x'] = pageMargins['left-margin'];
-        if(print['system-layout']) {
-            var systemLayout = print['system-layout'];
-            if(systemLayout['system-margins'] && 
-                systemLayout['system-margins']['left-margin']) {
-                measure['x'] += systemLayout['system-margins']['left-margin'];
-            }
-
-            if(systemLayout['top-system-distance'] != undefined) {
-                // new page
-                var topMargin = pageMargins['top-margin'];
-                measure['y'] = topMargin + systemLayout['top-system-distance'];
-            }
-            else if(systemLayout['system-distance'] != undefined) {
-                // new system
-                measure['y'] = aboveMeasure['bottom-line-y'] + systemLayout['system-distance'];
-            }
-            else {
-
-            }
-        }
-        else if(print['staff-layout']) {
-            // new system, staff
-            measure['y'] = aboveMeasure['bottom-line-y'] + print['staff-layout']['staff-distance'];
-        }
-        else {
-            Concerto.logError('lack of print tag');
-        }
-    }
-
-    var options = {
-        'space_above_staff_ln': 0
-    };
-    var stave = new Vex.Flow.Stave(measure['x'], measure['y'], measure['width'], options);
-    return stave;
-}
-
-Concerto.Parser.getAdditionalStave = function(measure, firstMeasure) {
-    var print = firstMeasure['print'];
-
-    if(print['staff-layout'] && print['staff-layout']['@number'] == 2) {
-        var y = measure['y'] + 40 + print['staff-layout']['staff-distance'];
-        var options = {
-            'space_above_staff_ln': 0
-        };
-        var stave = new Vex.Flow.Stave(measure['x'], y, measure['width'], options);
-        
-        return stave;
-    }
-    return undefined;
-}
-
 Concerto.Parser.getLeftMeasure = function(partIndex, measureIndex, measure, musicjson) {
     if(measure['print'] && 
         (measure['print']['@new-page'] || measure['print']['@new-system'])) {
@@ -300,6 +218,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
     var parts = musicjson['part'];
 
     var attributesManager = new Concerto.Parser.AttributesManager();
+    var layoutManager = new Concerto.Parser.LayoutManager(musicjson);
     
     var numMeasures = parts[0]['measure'].length;
     
@@ -310,6 +229,8 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
     var voices;
     var beams;
     var curPageIndex = 0;
+    layoutManager.setPageIndex(curPageIndex);
+
     var divisions = 1;
     var ctx = pages[curPageIndex];
 
@@ -325,6 +246,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
 
                 if(measure['print']['@new-page']) {
                     curPageIndex++;
+                    layoutManager.setPageIndex(curPageIndex);
                     ctx = pages[curPageIndex];
                 }
             }
@@ -333,18 +255,13 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
 
             var leftMeasure = Concerto.Parser.getLeftMeasure(p, i, measure, musicjson);
             var aboveMeasure = Concerto.Parser.getAboveMeasure(p, i, firstMeasure, musicjson);
-            var pageMargins = Concerto.Parser.getPageMargins(curPageIndex, musicjson['defaults']);
 
-            var stave = Concerto.Parser.getStave(measure, leftMeasure, aboveMeasure, pageMargins);
+            //var curStaves = layoutManager.getStaves(measure, p, i);
+            var curStaves = layoutManager.getStaves(measure, leftMeasure, aboveMeasure, firstMeasure);
+            staves = staves.concat(curStaves);
+            var stave = curStaves[0];
+            var stave2 = curStaves[1];
             
-            var stave2 = Concerto.Parser.getAdditionalStave(measure, firstMeasure);
-            var curStaves = [stave];
-            staves.push(stave);
-
-            if(stave2 != undefined) {
-                curStaves.push(stave2);
-                staves.push(stave2);
-            }
             measure['stave'] = stave;
             measure['stave2'] = stave2;
             var staveNotesDict = {};
@@ -402,7 +319,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                     // clef change,
                     if(note['clef']) {
                         attributesManager.setClefs(note['clef'], p);
-                        Concerto.logError('Clef change in middle of notes is unimplemented.');
+                        Concerto.logWarn('Clef change in middle of notes is unimplemented.');
                     }
                 }
                 else if(note['tag'] == 'note') {
@@ -441,11 +358,9 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                     noteManager.addForward(note['duration']);
                 }
             }
-
             
             var newBeams = Concerto.Parser.getBeams(notes);
             beams = beams.concat(newBeams);
-
             var newVoices = noteManager.getVoices(curStaves);
             voices = voices.concat(newVoices);
 
@@ -453,7 +368,6 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
             if(ctx == undefined) {
                 continue;
             }
-            
             stave.setContext(ctx).draw();
             measure['top-line-y'] = stave.getYForLine(0);
             measure['top-y'] = stave.y;

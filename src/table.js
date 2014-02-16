@@ -58,3 +58,7 @@ Concerto.Table.CLEF_TYPE_DICT = {
     'G': 'treble',
     'F': 'bass'
 };
+
+Concerto.Table.STAVE_DEFAULT_OPTIONS = {
+    'space_above_staff_ln': 0
+}
