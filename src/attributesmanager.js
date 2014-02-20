@@ -17,7 +17,7 @@ Concerto.Parser.AttributesManager = function() {
 	this.divisions = 1;
 	this.keyDict = {};
 	this.clefDict = {};
-}
+};
 
 
 /**
@@ -46,7 +46,7 @@ Concerto.Parser.AttributesManager.prototype.setClef = function(part, staff, clef
 			this.clefDict[part][staff] = clef;
 		}
 	}
-}
+};
 
 /**
  * Converts raw clefs and set.
@@ -78,7 +78,7 @@ Concerto.Parser.AttributesManager.prototype.setClefs = function(rawClefs, part) 
         }
         this.clefDict[part][staff] = clef;
 	}
-}
+};
 
 /**
  * Returns converted clef information.
@@ -96,7 +96,7 @@ Concerto.Parser.AttributesManager.prototype.getClef = function(part, staff, defa
 		return defaultClef;
 	}
 	return this.clefDict[part][staff];
-}
+};
 
 /**
  * @this {Concerto.Parser.AttributesManager}
@@ -112,7 +112,7 @@ Concerto.Parser.AttributesManager.prototype.setKeySignature = function(key, part
 		this.keyDict[part] = {};
 	}
 	this.keyDict[part][staff] = key;
-}
+};
 
 /**
  * @this {Concerto.Parser.AttributesManager}
@@ -125,7 +125,7 @@ Concerto.Parser.AttributesManager.prototype.getKeySignature = function(part, sta
 		staff = 1;
 	}
 	return this.keyDict[part][staff];
-}
+};
 
 /**
  * @this {Concerto.Parser.AttributesManager}
@@ -133,7 +133,7 @@ Concerto.Parser.AttributesManager.prototype.getKeySignature = function(part, sta
  */
 Concerto.Parser.AttributesManager.prototype.setDivisions = function(divisions) {
 	this.divisions = divisions;
-}
+};
 
 /**
  * @this {Concerto.Parser.AttributesManager}
@@ -141,7 +141,7 @@ Concerto.Parser.AttributesManager.prototype.setDivisions = function(divisions) {
  */
 Concerto.Parser.AttributesManager.prototype.getDivisions = function() {
 	return this.divisions;
-}
+};
 
 /**
  * @this {Concerto.Parser.AttributesManager}
@@ -149,7 +149,7 @@ Concerto.Parser.AttributesManager.prototype.getDivisions = function() {
  */
 Concerto.Parser.AttributesManager.prototype.setTimeSignature = function(time) {
 	this.time = time;
-}
+};
 
 /**
  * @this {Concerto.Parser.AttributesManager}
@@ -157,4 +157,57 @@ Concerto.Parser.AttributesManager.prototype.setTimeSignature = function(time) {
  */
 Concerto.Parser.AttributesManager.prototype.getTimeSignature = function() {
 	return this.time;
-}
+};
+
+
+// static functions
+
+/**
+ * @param {Object} stave
+ * @param {Object} keyDict
+ */
+Concerto.Parser.AttributesManager.addKeySignatureToStave = function(stave, keyDict) {
+    if(keyDict['fifths'] == undefined) {
+        Concerto.logError('key fifths does not exists');
+        return;
+    }
+
+    var fifths = keyDict['fifths']
+    var keySpec;
+
+    if(fifths == 0) {
+        keySpec = 'C';
+    }
+    else if(fifths > 0) {
+        keySpec = Concerto.Table.SHARP_MAJOR_KEY_SIGNATURES[fifths - 1];
+    }
+    else {
+        keySpec = Concerto.Table.FLAT_MAJOR_KEY_SIGNATURES[-fifths - 1];
+    }
+    stave.addKeySignature(keySpec);
+};
+
+/**
+ * @param {Object} stave
+ * @param {Object} timeDict
+ */
+Concerto.Parser.AttributesManager.addTimeSignatureToStave = function(stave, timeDict) {
+    var timeSpec;
+    if(timeDict['@symbol']) {
+        if(timeDict['@symbol'] == 'common') {
+            timeSpec = 'C';
+        }
+        else if(timeDict['@symbol'] == 'cut') {
+            timeSpec = 'C|';
+        }
+        else {
+            Concerto.logWarn('Unsupported time symbol');
+            timeSpec = 'C';
+        }
+    }
+    else {
+        timeSpec = timeDict['beats'] + '/' + timeDict['beat-type'];
+    }
+    stave.addTimeSignature(timeSpec);
+};
+
