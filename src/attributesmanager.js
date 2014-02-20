@@ -22,9 +22,9 @@ Concerto.Parser.AttributesManager = function() {
 
 /**
  * @this {Concerto.Parser.AttributesManager}
- * @param {string} clef 
  * @param {number} part
  * @param {number=} staff
+ * @param {string} clef
  */
 Concerto.Parser.AttributesManager.prototype.setClef = function(part, staff, clef) {
 	if(this.clefDict[part] == undefined) {

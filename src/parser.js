@@ -12,28 +12,6 @@ Concerto.Parser = {};
  Current verison only supports single staff, single voice.
 */
 
-Concerto.Parser.getLeftMeasure = function(partIndex, measureIndex, measure, musicjson) {
-    if(measure['print'] && 
-        (measure['print']['@new-page'] || measure['print']['@new-system'])) {
-        return undefined;
-    }
-    return musicjson['part'][partIndex]['measure'][measureIndex - 1];
-}
-
-Concerto.Parser.getAboveMeasure = function(partIndex, measureIndex, firstMeasure, musicjson) {
-    if(partIndex == 0) {
-        var i = measureIndex - 1;
-        if(firstMeasure['print']['system-layout']['top-system-distance'] != undefined) { // firstMeasure['print']['@new-page'] 
-            return undefined;
-        }
-        // @new-system
-        var parts = musicjson['part'];
-        return parts[parts.length - 1]['measure'][measureIndex - 1];
-    }
-
-    return musicjson['part'][partIndex - 1]['measure'][measureIndex];
-}
-
 Concerto.Parser.addKeySignatureInfo = function(stave, keyDict) {
     if(keyDict['fifths'] == undefined) {
         Concerto.logError('key fifths does not exists');
@@ -219,11 +197,9 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
 
     var attributesManager = new Concerto.Parser.AttributesManager();
     var layoutManager = new Concerto.Parser.LayoutManager(musicjson);
+    var measureManager = new Concerto.Parser.MeasureManager(musicjson);
     
     var numMeasures = parts[0]['measure'].length;
-    
-    // first measure on same line.
-    var firstMeasures = new Array(parts.length);
     
     var staves;
     var voices;
@@ -235,28 +211,23 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
     var ctx = pages[curPageIndex];
 
     for(var i = 0; i < numMeasures; i++) {
+        measureManager.setMeasureIndex(i);
         staves = [];
         beams = [];
         voices = [];
         for(var p = 0; p < parts.length; p++) {
+            measureManager.setPartIndex(p);
             var measure = parts[p]['measure'][i];
-            // measure['print'] exists mean that measure is first measure on the same line.
-            if(measure['print']) {
-                firstMeasures[p] = measure;
-
-                if(measure['print']['@new-page']) {
-                    curPageIndex++;
-                    layoutManager.setPageIndex(curPageIndex);
-                    ctx = pages[curPageIndex];
-                }
+            if(measure['print'] && measure['print']['@new-page']) {
+                curPageIndex++;
+                layoutManager.setPageIndex(curPageIndex);
+                ctx = pages[curPageIndex];
             }
-            
-            var firstMeasure = firstMeasures[p];
 
-            var leftMeasure = Concerto.Parser.getLeftMeasure(p, i, measure, musicjson);
-            var aboveMeasure = Concerto.Parser.getAboveMeasure(p, i, firstMeasure, musicjson);
+            var firstMeasure = measureManager.getFirstMeasure();
+            var leftMeasure = measureManager.getLeftMeasure();
+            var aboveMeasure = measureManager.getAboveMeasure();
 
-            //var curStaves = layoutManager.getStaves(measure, p, i);
             var curStaves = layoutManager.getStaves(measure, leftMeasure, aboveMeasure, firstMeasure);
             staves = staves.concat(curStaves);
             var stave = curStaves[0];
