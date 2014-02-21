@@ -12,6 +12,10 @@ Concerto.Parser = {};
  Current verison only supports single staff, single voice.
 */
 
+/**
+ * @param {Array} notes
+ * @return {Array}
+ */
 Concerto.Parser.getBeams = function(notes) {
     var beams = [];
     var temps = [];
@@ -34,8 +38,12 @@ Concerto.Parser.getBeams = function(notes) {
     }
 
     return beams;
-}
+};
 
+/**
+ * @param {Array} voices
+ * @param {Object} ctx
+ */
 Concerto.Parser.drawVoices = function(voices, ctx) {
     for(var i = 0; i < voices.length; i++) {
         var voice = voices[i][0];
@@ -47,6 +55,11 @@ Concerto.Parser.drawVoices = function(voices, ctx) {
     }
 };
 
+/**
+ * @param {Array} pages
+ * @param {Object} musicjson
+ * @return {Object}
+ */
 Concerto.Parser.parseAndDraw = function(pages, musicjson) {
     var parts = musicjson['part'];
 
@@ -242,7 +255,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
     return musicjson;
 
 
-}
+};
 
 
 

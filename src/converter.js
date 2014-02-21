@@ -59,7 +59,7 @@ Concerto.Converter.getPartList = function($xml) {
     // part-group
     // score-part
     $xml.find('part-list').children().each(function() {
-        if( $(this).prop('tagName') == 'part-group' ) {
+        if($(this).prop('tagName') == 'part-group') {
             var partGroup = {
                 'tag': 'part-group'
             };
@@ -69,7 +69,7 @@ Concerto.Converter.getPartList = function($xml) {
 
             partList.push(partGroup);
         }
-        else if( $(this).prop('tagName') == 'score-part' ) {
+        else if($(this).prop('tagName') == 'score-part') {
             var scorePart = {
                 'tag': 'score-part'
             };
@@ -89,7 +89,7 @@ Concerto.Converter.getPartList = function($xml) {
                 'midi-program': parseInt( $midiInstrument.find('midi-program').text() )
             };
 
-            partList.push( scorePart );
+            partList.push(scorePart);
         }
         else {
             Concerto.logError('Unsupported part-list children tags');
@@ -97,18 +97,18 @@ Concerto.Converter.getPartList = function($xml) {
     });
 
     return partList;
-}
+};
 
 Concerto.Converter.getPrintTag = function($print) {
     var print = {};
-    if( $print.attr('new-page') == 'yes') {
+    if($print.attr('new-page') == 'yes') {
         print['@new-page'] = true;
     }
-    else if( $print.attr('new-system') == 'yes') {
+    else if($print.attr('new-system') == 'yes') {
         print['@new-system'] = true;
     }
 
-    if( $print.find('system-layout').length > 0 ) {
+    if($print.find('system-layout').length > 0) {
         var $systemLayout = $print.find('system-layout');
         var $systemMargins = $systemLayout.find('system-margins');
         var systemLayout = {
@@ -117,16 +117,16 @@ Concerto.Converter.getPrintTag = function($print) {
                 'right-margin': parseFloat( $systemMargins.find('right-margin').text() )
             }
         };
-        if( $systemLayout.find('top-system-distance').length > 0 ) {
+        if($systemLayout.find('top-system-distance').length > 0) {
             systemLayout['top-system-distance'] = parseFloat( $systemLayout.find('top-system-distance').text() );
         }
-        else if( $systemLayout.find('system-distance').length > 0 ) {
+        else if($systemLayout.find('system-distance').length > 0) {
             systemLayout['system-distance'] = parseFloat( $systemLayout.find('system-distance').text() );
         }
         print['system-layout'] = systemLayout;
     }
     
-    if( $print.find('staff-layout').length > 0 ) {
+    if($print.find('staff-layout').length > 0) {
         // musicxml xsd says staff-layout maxOccurs is unbounded. 
         // but I haven't found this case which multiple staff-layout occurs in an one print tag.
         var $staffLayout = $print.find('staff-layout');
@@ -137,7 +137,7 @@ Concerto.Converter.getPrintTag = function($print) {
         print['staff-layout'] = staffLayout;
     }
     return print;
-}
+};
 
 Concerto.Converter.getAttributesTag = function($attributes) {
     var attributes = {
@@ -145,24 +145,24 @@ Concerto.Converter.getAttributesTag = function($attributes) {
     };
     
     var $divisions = $attributes.find('divisions');
-    if( $divisions.length > 0 ) {
+    if($divisions.length > 0) {
         attributes['divisions'] = parseInt( $divisions.text() );
     }
 
     var $staves = $attributes.find('staves');
-    if( $staves.length > 0 ) {
+    if($staves.length > 0) {
         attributes['staves'] = parseInt( $staves.text() );
     }
 
     var $clef = $attributes.find('clef');
-    if( $clef.length > 0 ) {
+    if($clef.length > 0) {
         var clefs = [];
         $clef.each(function() {
             var clef = {
                 'sign': $(this).find('sign').text(),
                 'line': parseInt( $(this).find('line').text() )
             };
-            if( $(this).attr('number') ) {
+            if($(this).attr('number')) {
                 clef['@number'] = parseInt( $(this).attr('number') );
             }
             clefs.push(clef);
@@ -173,28 +173,28 @@ Concerto.Converter.getAttributesTag = function($attributes) {
     }
 
     var $time = $attributes.find('time');
-    if( $time.length > 0 ) {
+    if($time.length > 0) {
         attributes['time'] = {
             'beats': parseInt( $time.find('beats').text() ),
             'beat-type': parseInt( $time.find('beat-type').text() )
         };
-        if( $time.attr('symbol') ) {
+        if($time.attr('symbol')) {
             attributes['time']['@symbol'] = $time.attr('symbol');
         }
     }
 
     var $key = $attributes.find('key');
-    if( $key.length > 0) {
+    if($key.length > 0) {
         attributes['key'] = {
             'fifths': $key.find('fifths').text()
         };
-        if( $key.find('mode').length > 0 ) {
+        if($key.find('mode').length > 0) {
             attributes['mode'] = $key.find('mode').text();
         }
     }
 
     return attributes;
-}
+};
 
 Concerto.Converter.getNoteTag = function($note) {
     var note = {
@@ -202,25 +202,25 @@ Concerto.Converter.getNoteTag = function($note) {
     };
 
     note['duration'] = parseInt( $note.find('duration').text() );
-    if( $note.find('type').length > 0 ) {
+    if($note.find('type').length > 0) {
         note['type'] = $note.find('type').text();    
     }
 
     var $accidental = $note.find('accidental');
-    if( $accidental.length > 0 ) {
+    if($accidental.length > 0) {
         note['accidental'] = $accidental.text();
     }
 
-    if( $note.find('rest').length > 0 ) {
+    if($note.find('rest').length > 0) {
         note['rest'] = true;
     }
     else {
         var $stem = $note.find('stem');
-        if( $stem.length > 0 ) {
+        if($stem.length > 0) {
             note['stem'] = ($stem.text() == 'down') ? 'up' : 'down';
         }
 
-        if( $note.find('chord').length > 0 ) {
+        if($note.find('chord').length > 0) {
             note['chord'] = true;
         }
 
@@ -237,35 +237,35 @@ Concerto.Converter.getNoteTag = function($note) {
         }
     }
 
-    if( $note.find('pitch').length > 0 ) {
+    if($note.find('pitch').length > 0) {
         var $pitch = $note.find('pitch');
         note['pitch'] = {
             'step': $pitch.find('step').text(),
             'octave': parseInt( $pitch.find('octave').text() )
         };
 
-        if( $pitch.find('alter').length > 0 ) {
+        if($pitch.find('alter').length > 0) {
             note['pitch']['alter'] = parseInt( $pitch.find('alter').text() );
         }
     }
 
     var $dot = $note.find('dot');
-    if( $dot.length > 0 ) {
+    if($dot.length > 0) {
         note['dot'] = $dot.length;
     }
 
     var $voice = $note.find('voice');
-    if( $voice.length > 0 ) {
+    if($voice.length > 0) {
         note['voice'] = parseInt( $voice.text() );
     }
 
     var $staff = $note.find('staff');
-    if( $staff.length > 0 ) {
+    if($staff.length > 0) {
         note['staff'] = parseInt( $staff.text() );
     }           
 
     return note;
-}
+};
 
 Concerto.Converter.getForwardAndBackupTag = function($elem) {
     var elem = {
@@ -273,7 +273,7 @@ Concerto.Converter.getForwardAndBackupTag = function($elem) {
         'duration': parseInt( $elem.find('duration').text() )
     };
     return elem;
-}
+};
 
 Concerto.Converter.getBarlineTag = function($barline) {
     var barline = {
@@ -359,7 +359,7 @@ Concerto.Converter.getPart = function( $xml ) {
     });
     
     return parts;
-}
+};
 
 
 Concerto.Converter.toJSON = function(musicxml) {
@@ -375,9 +375,10 @@ Concerto.Converter.toJSON = function(musicxml) {
     musicjson['part'] = Concerto.Converter.getPart($xml);
 
     return musicjson;
-}
+};
 
 Concerto.Converter.toXML = function(musicjson) {
     var musicxml = "";
     return musicxml;
-}
+};
+

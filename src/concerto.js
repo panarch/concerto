@@ -22,6 +22,9 @@ Concerto.LogLevels = {
     FATAL: 1
 };
 
+/**
+ * @enum {string}
+ */
 Concerto.LogLevelNames = {
     5: 'DEBUG',
     4: 'INFO',
@@ -79,3 +82,4 @@ Concerto.logFatal = function(message, exception) {
     Concerto.logMessage(Concerto.LogLevels.FATAL, message);
     if (exception) throw exception; else throw "ConcertoFatalError";
 };
+
