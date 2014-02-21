@@ -45,7 +45,7 @@ Concerto.Parser.drawVoices = function(voices, ctx) {
         //formatter.formatToStave([voice], stave);
         voice.draw(ctx, stave);
     }
-}
+};
 
 Concerto.Parser.parseAndDraw = function(pages, musicjson) {
     var parts = musicjson['part'];
@@ -90,6 +90,15 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
             
             measure['stave'] = stave;
             measure['stave2'] = stave2;
+
+            // barlines
+            Concerto.Parser.BarlineManager.addBarlineToStave(stave, measure['barline']);
+            if(stave2) {
+                Concerto.Parser.BarlineManager.addBarlineToStave(stave2, measure['barline']);    
+            }
+            
+
+
             var staveNotesDict = {};
 
             // check clef, time signature changes

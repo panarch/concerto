@@ -275,6 +275,33 @@ Concerto.Converter.getForwardAndBackupTag = function($elem) {
     return elem;
 }
 
+Concerto.Converter.getBarlineTag = function($barline) {
+    var barline = {
+        'tag': $barline.prop('tagName'),
+        'bar-style': $barline.find('bar-style').text(),
+        
+    };
+
+    if($barline.find('repeat').length > 0) {
+        barline['repeat'] = {
+            '@direction': $barline.find('repeat').attr('direction')
+        };
+    }
+    
+
+    var barlineLocation = $barline.attr('location');
+    if(barlineLocation == 'left') {
+        barline['@location'] = 'left';
+    }
+    else if(barlineLocation == 'middle') {
+        Concerto.logWarn('Unhandled barline @location - middle');
+    }
+    else {
+        barline['@location'] = 'right';
+    }
+
+    return barline;
+};
 
 Concerto.Converter.getPart = function( $xml ) {
     var parts = [];
@@ -287,17 +314,16 @@ Concerto.Converter.getPart = function( $xml ) {
         };
 
         $(this).find('measure').each(function() {
-            //var measureWidth = parseInt($(this).attr('width')) * 1.3;
-
             var measure = {
                 '@number': parseInt( $(this).attr('number') ),
                 'width': parseFloat( $(this).attr('width') ) ,
                 'note': [],
+                'barline': {}
             };
             
 
             $(this).children().each(function() {
-                // print, note, attributes, backward, forward
+                // print, note, attributes, backward, forward, barline
                 var tagName = $(this).prop('tagName');
                 if(tagName == 'print') {
                     measure['print'] = Concerto.Converter.getPrintTag( $(this) );
@@ -310,6 +336,16 @@ Concerto.Converter.getPart = function( $xml ) {
                 }
                 else if(tagName == 'backup' || tagName == 'forward') {
                     measure['note'].push( Concerto.Converter.getForwardAndBackupTag( $(this) ) );
+                }
+                else if(tagName == 'barline') {
+                    // should decide whether left or right barline.
+                    var barline = Concerto.Converter.getBarlineTag( $(this) );
+                    if(barline['@location'] == 'left') {
+                        measure['barline']['left-barline'] = barline;
+                    }
+                    else {
+                        measure['barline']['right-barline'] = barline;
+                    }
                 }
                 else {
                     Concerto.logError('Unsupported note tagname : ' + tagName);
