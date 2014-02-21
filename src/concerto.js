@@ -22,6 +22,14 @@ Concerto.LogLevels = {
     FATAL: 1
 };
 
+Concerto.LogLevelNames = {
+    5: 'DEBUG',
+    4: 'INFO',
+    3: 'WARN',
+    2: 'ERROR',
+    1: 'FATAL'
+};
+
 /**
  * Set the debuglevel for this application.
  *
@@ -41,11 +49,11 @@ Concerto.logMessage = function(level, message) {
 
         if (typeof(message) == 'object') {
             log_message = {
-                level: level,
+                level: Concerto.LogLevelNames[level],
                 message: message
             };
         } else {
-            log_message = "ConcertoLog: [" + level + "] " + log_message;
+            log_message = "ConcertoLog: [" + Concerto.LogLevelNames[level] + "] " + log_message;
         }
 
         window.console.log(log_message);
