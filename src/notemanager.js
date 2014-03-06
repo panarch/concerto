@@ -42,6 +42,15 @@ Concerto.Parser.NoteManager.prototype.addStaveNote = function(staveNote, note) {
 
 /**
  * @this {Concerto.Parser.NoteManager}
+ * @param {Object} clefNote
+ * @param {Object} note
+ */
+Concerto.Parser.NoteManager.prototype.addClefNote = function(clefNote, note) {
+    this.notes.push(clefNote);
+};
+
+/**
+ * @this {Concerto.Parser.NoteManager}
  * @param {number}
  */
 Concerto.Parser.NoteManager.prototype.addBackup = function(duration) {

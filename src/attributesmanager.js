@@ -17,6 +17,9 @@ Concerto.Parser.AttributesManager = function() {
 	this.divisions = 1;
 	this.keyDict = {};
 	this.clefDict = {};
+
+	this.partIndex = 0;
+	this.measureIndex = 0;
 };
 
 
@@ -159,8 +162,34 @@ Concerto.Parser.AttributesManager.prototype.getTimeSignature = function() {
 	return this.time;
 };
 
+/**
+ * @this {Concerto.Parser.AttributesManager}
+ * @param {number} partIndex
+ */
+Concerto.Parser.AttributesManager.prototype.setPartIndex = function(partIndex) {
+	this.partIndex = partIndex;
+};
+
+/**
+ * @this {Concerto.Parser.AttributesManager}
+ * @param {number} measureIndex
+ */
+Concerto.Parser.AttributesManager.prototype.setMeasureIndex = function(measureIndex) {
+	this.measureIndex = measureIndex;
+};
 
 // static functions
+
+/**
+ * @param {Object} stave
+ * @param {string} clef
+ * @param {string} defaultClef
+ */
+Concerto.Parser.AttributesManager.addClefToStave = function(stave, clef) {
+	if(clef == undefined) {
+
+	}
+};
 
 /**
  * @param {Object} stave
@@ -209,5 +238,36 @@ Concerto.Parser.AttributesManager.addTimeSignatureToStave = function(stave, time
         timeSpec = timeDict['beats'] + '/' + timeDict['beat-type'];
     }
     stave.addTimeSignature(timeSpec);
+};
+
+/**
+ * @param {Array.<Object>} staves
+ * @param {Array.<Object>} rawClefs
+ */
+Concerto.Parser.AttributesManager.addEndClefToStave = function(staves, rawClefs) {
+	for(var i = 0; i < rawClefs.length; i++) {
+		var rawClef = rawClefs[i];
+		var clefSign = rawClef['sign'];
+		var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
+		clef += '_small';
+		if(rawClef['@number'] == 1) {
+			staves[0].addEndClef(clef);
+		}
+		else {
+			staves[1].addEndClef(clef);
+		}
+	}
+};
+
+/**
+ * @param {Array.<Object>} rawClef
+ * @return {Object} clefNote;
+ */
+Concerto.Parser.AttributesManager.getClefNote = function(rawClefs) {
+	var clefSign = rawClefs[0]['sign'];
+	var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
+	clef += '_small';
+	var clefNote = new Vex.Flow.ClefNote(clef);
+	return clefNote;
 };
 

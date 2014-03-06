@@ -80,11 +80,13 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
 
     for(var i = 0; i < numMeasures; i++) {
         measureManager.setMeasureIndex(i);
+        attributesManager.setMeasureIndex(i);
         staves = [];
         beams = [];
         voices = [];
         for(var p = 0; p < parts.length; p++) {
             measureManager.setPartIndex(p);
+            attributesManager.setPartIndex(p);
             var measure = parts[p]['measure'][i];
             if(measure['print'] && measure['print']['@new-page']) {
                 curPageIndex++;
@@ -167,7 +169,15 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                     // clef change,
                     if(note['clef']) {
                         attributesManager.setClefs(note['clef'], p);
-                        Concerto.logWarn('Clef change in middle of notes is unimplemented.');
+
+                        if(note[j + 1] == undefined) {
+                            Concerto.Parser.AttributesManager.addEndClefToStave(curStaves, note['clef']);
+                        }
+                        else {
+                            var clefNote = Concerto.Parser.AttributesManager.getClefNote(note['clef']);
+                            noteManager.addClefNote(clefNote, note);
+                        }
+                        
                     }
                 }
                 else if(note['tag'] == 'note') {
