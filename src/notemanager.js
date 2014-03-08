@@ -170,6 +170,84 @@ Concerto.Parser.NoteManager.getStaveNoteTypeFromDuration = function(duration, di
 }
 
 /**
+ * @param {Object} staveNote
+ * @param {Object} note
+ */
+Concerto.Parser.NoteManager.addTechnicalToStaveNote = function(staveNote, note) {
+    var notationsDict = note['notations'];
+    if(notationsDict['technical'] !== undefined) {
+        for(var i = 0; i < notationsDict['technical'].length; i++) {
+            var item = notationsDict['technical'][i];
+            var technicalSymbol;
+            if(item['tag'] == 'down-bow') {
+                technicalSymbol = 'am';
+            }
+            else if(item['tag'] == 'up-bow') {
+                technicalSymbol = 'a|';
+            }
+            else if(item['tag'] == 'snap-pizzicato') {
+                technicalSymbol = 'ao';
+            }
+            else {
+                Concerto.logWarn('Unhandled technical symbol.');
+            }
+
+            if(technicalSymbol !== undefined) {
+                var technical = new Vex.Flow.Articulation(technicalSymbol);
+                if(note['stem'] == 'up') {
+                    technical.setPosition(Vex.Flow.Modifier.Position.ABOVE);
+                }
+                else {
+                    technical.setPosition(Vex.Flow.Modifier.Position.BELOW);
+                }
+                staveNote.addArticulation(0, technical);
+            }
+        }
+    }
+};
+
+/**
+ * @param {Object} staveNote
+ * @param {Object} note
+ */
+Concerto.Parser.NoteManager.addArticulationToStaveNote = function(staveNote, note) {
+    var notationsDict = note['notations'];
+    if(notationsDict['articulations'] !== undefined) {
+        for(var i = 0; i < notationsDict['articulations'].length; i++) {
+            var item = notationsDict['articulations'][i];
+            var articulationSymbol;
+            if(item['tag'] == 'accent') {
+                articulationSymbol = 'a>';
+            }
+            else if(item['tag'] == 'staccato') {
+                articulationSymbol = 'a.';
+            }
+            else if(item['tag'] == 'tenuto') {
+                articulationSymbol = 'a-';
+            }
+            else if(item['tag'] == 'strong-accent') {
+                // marcato, currently only supports up marcato
+                articulationSymbol = 'a^';
+            }
+            else {
+                Concerto.logWarn('Unhandled articulations symbol.');
+            }
+
+            if(articulationSymbol !== undefined) {
+                var articulation = new Vex.Flow.Articulation(articulationSymbol);
+                if(note['stem'] == 'up') {
+                    articulation.setPosition(Vex.Flow.Modifier.Position.ABOVE);
+                }
+                else {
+                    articulation.setPosition(Vex.Flow.Modifier.Position.BELOW);
+                }
+                staveNote.addArticulation(0, articulation);
+            }
+        }
+    }
+};
+
+/**
  * @param {Array.<Object>} notes
  * @param {string} clef
  * @param {number} divisions
@@ -232,10 +310,33 @@ Concerto.Parser.NoteManager.getStaveNote = function(notes, clef, divisions) {
     if(baseNote['stem'] == 'up') {
         staveNote.setStemDirection(Vex.Flow.StaveNote.STEM_DOWN);
     }
+
+    // notations
+    if(baseNote['notations'] !== undefined) {
+        var notationsDict = baseNote['notations'];
+
+        // fermata
+        if(notationsDict['fermata'] !== undefined) {
+            var fermataType = notationsDict['fermata']['@type'];
+            if(fermataType == 'upright') {
+                staveNote.addArticulation(0, 
+                    new Vex.Flow.Articulation('a@a').setPosition(Vex.Flow.Modifier.Position.ABOVE));
+            }
+            else if(fermataType == 'inverted') {
+                staveNote.addArticulation(0, 
+                    new Vex.Flow.Articulation('a@u').setPosition(Vex.Flow.Modifier.Position.BELOW));
+            }
+            else {
+                Concerto.logError('Unhandled fermata type.');
+            }
+        }
+
+        // technical
+        Concerto.Parser.NoteManager.addTechnicalToStaveNote(staveNote, baseNote);
+
+        // articulations
+        Concerto.Parser.NoteManager.addArticulationToStaveNote(staveNote, baseNote);
+    }
                 
     return staveNote;
 };
-
-
-
-

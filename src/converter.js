@@ -262,7 +262,51 @@ Concerto.Converter.getNoteTag = function($note) {
     var $staff = $note.find('staff');
     if($staff.length > 0) {
         note['staff'] = parseInt( $staff.text() );
-    }           
+    }
+
+    var $notations = $note.find('notations');
+    if($notations.length > 0) {
+        note['notations'] = {
+
+        };
+        
+        // fermata
+        var $fermata = $notations.find('fermata');
+        if($fermata.length > 0) {
+            var fermata = {};
+            if($fermata.attr('type')) {
+                fermata['@type'] = $fermata.attr('type');
+            }
+            else {
+                fermata['@type'] = 'upright';
+            }
+            note['notations']['fermata'] = fermata;
+        }
+
+        // technical
+        var $technical = $notations.find('technical');
+        if($technical.length > 0) {
+            var technical = [];
+            $technical.children().each(function() {
+                technical.push({
+                    'tag': $(this).prop('tagName')
+                });
+            });
+            note['notations']['technical'] = technical;
+        }
+        
+        // articulations
+        var $articulations = $notations.find('articulations');
+        if($articulations.length > 0) {
+            var articulations = [];
+            $articulations.children().each(function() {
+                articulations.push({
+                    'tag': $(this).prop('tagName')
+                });
+            });
+            note['notations']['articulations'] = articulations;
+        }
+    }
 
     return note;
 };
