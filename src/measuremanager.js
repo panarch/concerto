@@ -10,12 +10,12 @@
  * @template Concerto.Parser.MeasureManager
  */
 Concerto.Parser.MeasureManager = function(musicjson) {
-	this.parts = musicjson['part'];
-	this.pageLayout = musicjson['defaults']['page-layout'];
-	// first measure on same line.
-	this.firstMeasures = new Array(this.parts.length);
-	this.partIndex = 0;
-	this.measureIndex = 0;
+    this.parts = musicjson['part'];
+    this.pageLayout = musicjson['defaults']['page-layout'];
+    // first measure on same line.
+    this.firstMeasures = new Array(this.parts.length);
+    this.partIndex = 0;
+    this.measureIndex = 0;
 };
 
 /** 
@@ -23,11 +23,11 @@ Concerto.Parser.MeasureManager = function(musicjson) {
  * @param {number} partIndex
  */
 Concerto.Parser.MeasureManager.prototype.setPartIndex = function(partIndex) {
-	this.partIndex = partIndex;
-	var measure = this.parts[this.partIndex]['measure'][this.measureIndex];
-	if(measure['print']) {
-		this.firstMeasures[this.partIndex] = measure;
-	}
+    this.partIndex = partIndex;
+    var measure = this.parts[this.partIndex]['measure'][this.measureIndex];
+    if(measure['print']) {
+        this.firstMeasures[this.partIndex] = measure;
+    }
 };
 
 /**
@@ -35,7 +35,7 @@ Concerto.Parser.MeasureManager.prototype.setPartIndex = function(partIndex) {
  * @param {number} measureIndex
  */
 Concerto.Parser.MeasureManager.prototype.setMeasureIndex = function(measureIndex) {
-	this.measureIndex = measureIndex;
+    this.measureIndex = measureIndex;
 };
 
 /**
@@ -44,10 +44,10 @@ Concerto.Parser.MeasureManager.prototype.setMeasureIndex = function(measureIndex
  * @return {Object}
  */
 Concerto.Parser.MeasureManager.prototype.getFirstMeasure = function(partIndex) {
-	if(partIndex == undefined) {
-		partIndex = this.partIndex;
-	}
-	return this.firstMeasures[partIndex];
+    if(partIndex === undefined) {
+        partIndex = this.partIndex;
+    }
+    return this.firstMeasures[partIndex];
 };
 
 /**
@@ -55,8 +55,8 @@ Concerto.Parser.MeasureManager.prototype.getFirstMeasure = function(partIndex) {
  * @return {Object=}
  */
 Concerto.Parser.MeasureManager.prototype.getLeftMeasure = function() {
-	var measure = this.parts[this.partIndex]['measure'][this.measureIndex];
-	if(measure['print'] && 
+    var measure = this.parts[this.partIndex]['measure'][this.measureIndex];
+    if(measure['print'] && 
         (measure['print']['@new-page'] || measure['print']['@new-system'])) {
         return undefined;
     }
@@ -69,11 +69,11 @@ Concerto.Parser.MeasureManager.prototype.getLeftMeasure = function() {
  * @return {Object}
  */
 Concerto.Parser.MeasureManager.prototype.getAboveMeasure = function() {
-    if(this.partIndex == 0) {
+    if(this.partIndex === 0) {
         var i = this.measureIndex - 1;
         var firstMeasure = this.getFirstMeasure(this.partIndex);
-        if(firstMeasure['print']['system-layout']['top-system-distance'] != undefined) { 
-        	// firstMeasure['print']['@new-page'] 
+        if(firstMeasure['print']['system-layout']['top-system-distance'] !== undefined) { 
+            // firstMeasure['print']['@new-page'] 
             return undefined;
         }
         // @new-system

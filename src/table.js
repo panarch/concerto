@@ -48,7 +48,7 @@ Concerto.Table.NOTE_TYPE_DICT = {
     'breve'     : 'w',
     'long'      : 'w',
     'maxima'    : 'w'
-}
+};
 
 Concerto.Table.NOTE_VEX_TYPE_DICT = {
 
@@ -61,4 +61,4 @@ Concerto.Table.CLEF_TYPE_DICT = {
 
 Concerto.Table.STAVE_DEFAULT_OPTIONS = {
     'space_above_staff_ln': 0
-}
+};

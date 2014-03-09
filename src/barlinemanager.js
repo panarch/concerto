@@ -40,15 +40,16 @@ Concerto.Parser.BarlineManager.getBarlineType = function(barline, isLeft) {
  * @param {object} barlineDict
  */
 Concerto.Parser.BarlineManager.addBarlineToStave = function(stave, barlineDict) {
+    var barlineType;
     if(barlineDict['left-barline']) {
         var leftBarline = barlineDict['left-barline'];
-        var barlineType = Concerto.Parser.BarlineManager.getBarlineType(leftBarline, true);
+        barlineType = Concerto.Parser.BarlineManager.getBarlineType(leftBarline, true);
         stave.setBegBarType(barlineType);
     }
 
     if(barlineDict['right-barline']) {
         var rightBarline = barlineDict['right-barline'];
-        var barlineType = Concerto.Parser.BarlineManager.getBarlineType(rightBarline, false);
+        barlineType = Concerto.Parser.BarlineManager.getBarlineType(rightBarline, false);
         stave.setEndBarType(barlineType);
     }
 };

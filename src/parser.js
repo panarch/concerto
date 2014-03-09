@@ -19,8 +19,9 @@ Concerto.Parser = {};
 Concerto.Parser.getBeams = function(notes) {
     var beams = [];
     var temps = [];
+    var note;
     for(var i = 0; i < notes.length; i++) {
-        var note = notes[i];
+        note = notes[i];
         if(!note['beam']) {
             continue;
         }
@@ -77,14 +78,15 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
 
     var divisions = 1;
     var ctx = pages[curPageIndex];
+    var p, i, j, k;
 
-    for(var i = 0; i < numMeasures; i++) {
+    for(i = 0; i < numMeasures; i++) {
         measureManager.setMeasureIndex(i);
         attributesManager.setMeasureIndex(i);
         staves = [];
         beams = [];
         voices = [];
-        for(var p = 0; p < parts.length; p++) {
+        for(p = 0; p < parts.length; p++) {
             measureManager.setPartIndex(p);
             attributesManager.setPartIndex(p);
             var measure = parts[p]['measure'][i];
@@ -119,9 +121,10 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
             // check clef, time signature changes
             var notes = measure['note'];
             var noteManager = new Concerto.Parser.NoteManager(attributesManager);
-            
+            var note, clef;
+
             if(notes.length > 0) {
-                var note = notes[0];
+                note = notes[0];
                 var isAttributes = (note['tag'] == 'attributes');
                 var clefExists = false;
                 if(isAttributes && note['clef']) {
@@ -131,10 +134,10 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                 }
                 
                 if(measure['print'] || clefExists) {
-                    for(var k = 0; k < curStaves.length; k++) {
+                    for(k = 0; k < curStaves.length; k++) {
                         var staff = k + 1;
-                        var clef = attributesManager.getClef(p, staff);
-                        if(clef != undefined) {
+                        clef = attributesManager.getClef(p, staff);
+                        if(clef !== undefined) {
                             curStaves[k].addClef(clef);
                         }
                     }
@@ -162,15 +165,15 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                 }    
             }
 
-            for(var j = 0; j < notes.length; j++) {
-                var note = notes[j];
+            for(j = 0; j < notes.length; j++) {
+                note = notes[j];
                 // backup, forward
                 if(j > 0 && note['tag'] == 'attributes') {
                     // clef change,
                     if(note['clef']) {
                         attributesManager.setClefs(note['clef'], p);
 
-                        if(note[j + 1] == undefined) {
+                        if(note[j + 1] === undefined) {
                             Concerto.Parser.AttributesManager.addEndClefToStave(curStaves, note['clef']);
                         }
                         else {
@@ -182,7 +185,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                 }
                 else if(note['tag'] == 'note') {
                     var chordNotes = [note];
-                    for(var k = j + 1; k < notes.length; k++) {
+                    for(k = j + 1; k < notes.length; k++) {
                         var nextNote = notes[k];
                         if(!nextNote['chord']) {
                             break;
@@ -194,13 +197,14 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                     }
                     
                     
-                    var clef = attributesManager.getClef(p, note['staff'], Concerto.Table.DEFAULT_CLEF);
+                    clef = attributesManager.getClef(p, note['staff'], Concerto.Table.DEFAULT_CLEF);
+                    var staveNote;
                     if(note['staff'] && note['staff'] == 2) {
-                        var staveNote = Concerto.Parser.NoteManager.getStaveNote(chordNotes, clef, divisions);
+                        staveNote = Concerto.Parser.NoteManager.getStaveNote(chordNotes, clef, divisions);
                         noteManager.addStaveNote(staveNote, note);
                     }
                     else {
-                        var staveNote = Concerto.Parser.NoteManager.getStaveNote(chordNotes, clef, divisions);
+                        staveNote = Concerto.Parser.NoteManager.getStaveNote(chordNotes, clef, divisions);
                         noteManager.addStaveNote(staveNote, note);
                     }
                     
@@ -221,7 +225,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
             voices = voices.concat(newVoices);
 
             // draw stave
-            if(ctx == undefined) {
+            if(ctx === undefined) {
                 continue;
             }
             stave.setContext(ctx).draw();
@@ -237,14 +241,14 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
             }
         }
 
-        if(ctx == undefined) {
+        if(ctx === undefined) {
             continue;
         }
         
         // does vexflow not support multiple part formatting?
         Concerto.Parser.drawVoices(voices, ctx);
 
-        for(var j = 0; j < beams.length; j++) {
+        for(j = 0; j < beams.length; j++) {
             beams[j].setContext(ctx).draw();
         }
 

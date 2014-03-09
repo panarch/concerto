@@ -28,7 +28,7 @@ Concerto.Parser.NoteManager.prototype.addStaveNote = function(staveNote, note) {
     var voice = note['voice'];
     var staff = note['staff'];
     
-    if(staff == undefined) {
+    if(staff === undefined) {
         staff = 1;
     }
     if(this.staffUndecided) {
@@ -88,8 +88,9 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
     var voices = [];
     var preStaff = this.staffList[0];
     var staffVoices = [];
-    var stave = undefined;
+    var stave;
     var time = this.attributesManager.getTimeSignature();
+    var formatter;
     for(var i = 0; i < this.notesList.length; i++) {
         var staff = this.staffList[i];
         stave = staves[staff - 1];
@@ -102,7 +103,7 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
         voice = voice.addTickables(notes);
         voices.push([voice, stave]);
         if(preStaff != staff) {
-            var formatter = new Vex.Flow.Formatter();
+            formatter = new Vex.Flow.Formatter();
             formatter.joinVoices(staffVoices);
             formatter.formatToStave(staffVoices, stave);
             staffVoices = [voice];
@@ -112,7 +113,7 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
         }
     }
 
-    var formatter = new Vex.Flow.Formatter();
+    formatter = new Vex.Flow.Formatter();
     formatter.joinVoices(staffVoices);
     formatter.formatToStave(staffVoices, stave);
 
@@ -128,13 +129,14 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
  * @param {boolean=} withDots
  */
 Concerto.Parser.NoteManager.getStaveNoteTypeFromDuration = function(duration, divisions, withDots) {
-    if(withDots == undefined) {
+    if(withDots === undefined) {
         withDots = false;
     }
 
     var i = Concerto.Table.NOTE_VEX_QUARTER_INDEX;
-    for(var count = 0; count < 20; count++) {
-        var num = Math.floor(duration / divisions);
+    var count, num;
+    for(count = 0; count < 20; count++) {
+        num = Math.floor(duration / divisions);
         if(num == 1) {
             break;
         }
@@ -153,10 +155,10 @@ Concerto.Parser.NoteManager.getStaveNoteTypeFromDuration = function(duration, di
 
     var noteType = Concerto.Table.NOTE_VEX_TYPES[i];
     if(withDots) {
-        for(var count = 0; count < 5; count++) {
+        for(count = 0; count < 5; count++) {
             duration -= Math.floor(duration / divisions);
             divisions /= 2;
-            var num = Math.floor(duration / divisions);
+            num = Math.floor(duration / divisions);
             if(num == 1) {
                 noteType += 'd';
             }
@@ -167,7 +169,7 @@ Concerto.Parser.NoteManager.getStaveNoteTypeFromDuration = function(duration, di
     }
 
     return noteType;
-}
+};
 
 /**
  * @param {Object} staveNote
@@ -257,7 +259,9 @@ Concerto.Parser.NoteManager.getStaveNote = function(notes, clef, divisions) {
     var accidentals = [];
     var baseNote = notes[0];
     var duration;
-    if(baseNote['type'] != undefined) {
+    var i;
+
+    if(baseNote['type'] !== undefined) {
         duration = Concerto.Table.NOTE_TYPE_DICT[baseNote['type']];
     }
     else {
@@ -271,7 +275,7 @@ Concerto.Parser.NoteManager.getStaveNote = function(notes, clef, divisions) {
     }
     else {
         // compute keys 
-        for(var i = 0; i < notes.length; i++) {
+        for(i = 0; i < notes.length; i++) {
             var note = notes[i];
             var key = note['pitch']['step'].toLowerCase();
             if(note['accidental']) {
@@ -288,21 +292,21 @@ Concerto.Parser.NoteManager.getStaveNote = function(notes, clef, divisions) {
     }
 
     if(baseNote['dot']) {
-        for(var i = 0; i < baseNote['dot']; i++) {
+        for(i = 0; i < baseNote['dot']; i++) {
             duration += 'd';
         }
     }
     
     var staveNote = new Vex.Flow.StaveNote({ keys: keys, duration: duration, clef: clef });
-
-    for(var i = 0; i < accidentals.length; i++) {
+    
+    for(i = 0; i < accidentals.length; i++) {
         if(accidentals[i]) {
             staveNote.addAccidental(i, new Vex.Flow.Accidental( accidentals[i] ));
         }
     }
 
     if(baseNote['dot']) {
-        for(var i = 0; i < baseNote['dot']; i++) {
+        for(i = 0; i < baseNote['dot']; i++) {
             staveNote.addDotToAll();
         }
     }

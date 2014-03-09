@@ -18,7 +18,7 @@ Concerto.Converter.getIdentification = function($xml) {
     };
 
     return identification;
-}
+};
 
 Concerto.Converter.getDefaults = function($xml) {
     var $defaults = $xml.find('defaults');
@@ -225,7 +225,7 @@ Concerto.Converter.getNoteTag = function($note) {
         }
 
         var $beam = $note.find('beam');
-        if($beam.length != 0) {
+        if($beam.length !== 0) {
             note['beam'] = [];
             $beam.each(function() {
                 var beam = {};

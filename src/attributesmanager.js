@@ -10,16 +10,16 @@
  * @template Concerto.Parser.AttributesManager
  */
 Concerto.Parser.AttributesManager = function() {
-	this.time = {
-		'beats': Concerto.Table.DEFAULT_TIME_BEATS,
-		'beat-type': Concerto.Table.DEFAULT_TIME_BEAT_TYPE 
-	};
-	this.divisions = 1;
-	this.keyDict = {};
-	this.clefDict = {};
+    this.time = {
+        'beats': Concerto.Table.DEFAULT_TIME_BEATS,
+        'beat-type': Concerto.Table.DEFAULT_TIME_BEAT_TYPE 
+    };
+    this.divisions = 1;
+    this.keyDict = {};
+    this.clefDict = {};
 
-	this.partIndex = 0;
-	this.measureIndex = 0;
+    this.partIndex = 0;
+    this.measureIndex = 0;
 };
 
 
@@ -30,25 +30,25 @@ Concerto.Parser.AttributesManager = function() {
  * @param {string} clef
  */
 Concerto.Parser.AttributesManager.prototype.setClef = function(part, staff, clef) {
-	if(this.clefDict[part] == undefined) {
-		this.clefDict[part] = {};
-	}
+    if(this.clefDict[part] === undefined) {
+        this.clefDict[part] = {};
+    }
 
-	if(staff == undefined) {
-		staff = 1;
-		this.clefDict[part][staff] = clef;
-	}
-	else {
-		if(staff == 1) {
-			this.clefDict[part][staff] = clef;
-			if(this.clefDict[part][2] == undefined) {
-				this.clefDict[part][2] = clef;
-			}
-		}
-		else {
-			this.clefDict[part][staff] = clef;
-		}
-	}
+    if(staff === undefined) {
+        staff = 1;
+        this.clefDict[part][staff] = clef;
+    }
+    else {
+        if(staff == 1) {
+            this.clefDict[part][staff] = clef;
+            if(this.clefDict[part][2] === undefined) {
+                this.clefDict[part][2] = clef;
+            }
+        }
+        else {
+            this.clefDict[part][staff] = clef;
+        }
+    }
 };
 
 /**
@@ -58,29 +58,29 @@ Concerto.Parser.AttributesManager.prototype.setClef = function(part, staff, clef
  * @param {number} part
  */
 Concerto.Parser.AttributesManager.prototype.setClefs = function(rawClefs, part) {
-	if(this.clefDict[part] == undefined) {
-		this.clefDict[part] = {};
-	}
+    if(this.clefDict[part] === undefined) {
+        this.clefDict[part] = {};
+    }
 
-	for(var i = 0; i < rawClefs.length; i++) {
-		var rawClef = rawClefs[i];
-		var clefSign = rawClef['sign'];
-		var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
-		
-        if(clef == undefined) {
+    for(var i = 0; i < rawClefs.length; i++) {
+        var rawClef = rawClefs[i];
+        var clefSign = rawClef['sign'];
+        var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
+        
+        if(clef === undefined) {
             Concerto.logError('Unsupported clef sign: ' + clefSign);
             clef = Concerto.Table.DEFAULT_CLEF;
         }
 
         var staff;
-        if(rawClef['@number'] != undefined) {
-        	staff = rawClef['@number'];
+        if(rawClef['@number'] !== undefined) {
+            staff = rawClef['@number'];
         }
         else {
-        	staff = 1;
+            staff = 1;
         }
         this.clefDict[part][staff] = clef;
-	}
+    }
 };
 
 /**
@@ -92,13 +92,13 @@ Concerto.Parser.AttributesManager.prototype.setClefs = function(rawClefs, part) 
  * @return {string} clef
  */
 Concerto.Parser.AttributesManager.prototype.getClef = function(part, staff, defaultClef) {
-	if(staff == undefined) {
-		staff = 1;
-	}
-	if(this.clefDict[part] == undefined || this.clefDict[part][staff] == undefined) {
-		return defaultClef;
-	}
-	return this.clefDict[part][staff];
+    if(staff === undefined) {
+        staff = 1;
+    }
+    if(this.clefDict[part] === undefined || this.clefDict[part][staff] === undefined) {
+        return defaultClef;
+    }
+    return this.clefDict[part][staff];
 };
 
 /**
@@ -108,13 +108,13 @@ Concerto.Parser.AttributesManager.prototype.getClef = function(part, staff, defa
  * @param {number=} staff
  */
 Concerto.Parser.AttributesManager.prototype.setKeySignature = function(key, part, staff) {
-	if(staff == undefined) {
-		staff = 1;
-	}
-	if(this.keyDict[part] == undefined) {
-		this.keyDict[part] = {};
-	}
-	this.keyDict[part][staff] = key;
+    if(staff === undefined) {
+        staff = 1;
+    }
+    if(this.keyDict[part] === undefined) {
+        this.keyDict[part] = {};
+    }
+    this.keyDict[part][staff] = key;
 };
 
 /**
@@ -124,10 +124,10 @@ Concerto.Parser.AttributesManager.prototype.setKeySignature = function(key, part
  * @return {Object}
  */
 Concerto.Parser.AttributesManager.prototype.getKeySignature = function(part, staff) {
-	if(staff == undefined) {
-		staff = 1;
-	}
-	return this.keyDict[part][staff];
+    if(staff === undefined) {
+        staff = 1;
+    }
+    return this.keyDict[part][staff];
 };
 
 /**
@@ -135,7 +135,7 @@ Concerto.Parser.AttributesManager.prototype.getKeySignature = function(part, sta
  * @param {number} divisions
  */
 Concerto.Parser.AttributesManager.prototype.setDivisions = function(divisions) {
-	this.divisions = divisions;
+    this.divisions = divisions;
 };
 
 /**
@@ -143,7 +143,7 @@ Concerto.Parser.AttributesManager.prototype.setDivisions = function(divisions) {
  * @return {number}
  */
 Concerto.Parser.AttributesManager.prototype.getDivisions = function() {
-	return this.divisions;
+    return this.divisions;
 };
 
 /**
@@ -151,7 +151,7 @@ Concerto.Parser.AttributesManager.prototype.getDivisions = function() {
  * @param {Object.<string, number>}
  */
 Concerto.Parser.AttributesManager.prototype.setTimeSignature = function(time) {
-	this.time = time;
+    this.time = time;
 };
 
 /**
@@ -159,7 +159,7 @@ Concerto.Parser.AttributesManager.prototype.setTimeSignature = function(time) {
  * @return {Object.<string, number>}
  */
 Concerto.Parser.AttributesManager.prototype.getTimeSignature = function() {
-	return this.time;
+    return this.time;
 };
 
 /**
@@ -167,7 +167,7 @@ Concerto.Parser.AttributesManager.prototype.getTimeSignature = function() {
  * @param {number} partIndex
  */
 Concerto.Parser.AttributesManager.prototype.setPartIndex = function(partIndex) {
-	this.partIndex = partIndex;
+    this.partIndex = partIndex;
 };
 
 /**
@@ -175,7 +175,7 @@ Concerto.Parser.AttributesManager.prototype.setPartIndex = function(partIndex) {
  * @param {number} measureIndex
  */
 Concerto.Parser.AttributesManager.prototype.setMeasureIndex = function(measureIndex) {
-	this.measureIndex = measureIndex;
+    this.measureIndex = measureIndex;
 };
 
 // static functions
@@ -186,9 +186,9 @@ Concerto.Parser.AttributesManager.prototype.setMeasureIndex = function(measureIn
  * @param {string} defaultClef
  */
 Concerto.Parser.AttributesManager.addClefToStave = function(stave, clef) {
-	if(clef == undefined) {
+    if(clef === undefined) {
 
-	}
+    }
 };
 
 /**
@@ -196,15 +196,15 @@ Concerto.Parser.AttributesManager.addClefToStave = function(stave, clef) {
  * @param {Object} keyDict
  */
 Concerto.Parser.AttributesManager.addKeySignatureToStave = function(stave, keyDict) {
-    if(keyDict['fifths'] == undefined) {
+    if(keyDict['fifths'] === undefined) {
         Concerto.logError('key fifths does not exists');
         return;
     }
 
-    var fifths = keyDict['fifths']
+    var fifths = keyDict['fifths'];
     var keySpec;
 
-    if(fifths == 0) {
+    if(fifths === 0) {
         keySpec = 'C';
     }
     else if(fifths > 0) {
@@ -245,18 +245,18 @@ Concerto.Parser.AttributesManager.addTimeSignatureToStave = function(stave, time
  * @param {Array.<Object>} rawClefs
  */
 Concerto.Parser.AttributesManager.addEndClefToStave = function(staves, rawClefs) {
-	for(var i = 0; i < rawClefs.length; i++) {
-		var rawClef = rawClefs[i];
-		var clefSign = rawClef['sign'];
-		var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
-		clef += '_small';
-		if(rawClef['@number'] == 1) {
-			staves[0].addEndClef(clef);
-		}
-		else {
-			staves[1].addEndClef(clef);
-		}
-	}
+    for(var i = 0; i < rawClefs.length; i++) {
+        var rawClef = rawClefs[i];
+        var clefSign = rawClef['sign'];
+        var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
+        clef += '_small';
+        if(rawClef['@number'] == 1) {
+            staves[0].addEndClef(clef);
+        }
+        else {
+            staves[1].addEndClef(clef);
+        }
+    }
 };
 
 /**
@@ -264,10 +264,10 @@ Concerto.Parser.AttributesManager.addEndClefToStave = function(staves, rawClefs)
  * @return {Object} clefNote;
  */
 Concerto.Parser.AttributesManager.getClefNote = function(rawClefs) {
-	var clefSign = rawClefs[0]['sign'];
-	var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
-	clef += '_small';
-	var clefNote = new Vex.Flow.ClefNote(clef);
-	return clefNote;
+    var clefSign = rawClefs[0]['sign'];
+    var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
+    clef += '_small';
+    var clefNote = new Vex.Flow.ClefNote(clef);
+    return clefNote;
 };
 
