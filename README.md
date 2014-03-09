@@ -19,8 +19,7 @@ demo/demo.html
 ## Prerequisties (for Developers)
 For performing full builds, you need the following:
 
-* Grunt
-
+#### Grunt
 
     $ node -g install grunt-cli
     $ node install grunt-contrib-jshint
