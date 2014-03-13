@@ -37,7 +37,12 @@ Concerto.Converter.getDefaults = function($xml) {
     var $pageMargins = $defaults.find('page-margins');
     $pageMargins.each(function() {
         var pageMargin = {};
-        pageMargin['@type'] = $(this).attr('type');
+        if($(this).attr('type')) {
+            pageMargin['@type'] = $(this).attr('type');
+        }
+        else {
+            pageMargin['@type'] = 'both';
+        }
         pageMargin['left-margin'] = parseFloat( $(this).find('left-margin').text() );
         pageMargin['right-margin'] = parseFloat( $(this).find('right-margin').text() );
         pageMargin['top-margin'] = parseFloat( $(this).find('top-margin').text() );
@@ -64,7 +69,7 @@ Concerto.Converter.getPartList = function($xml) {
                 'tag': 'part-group'
             };
             partGroup['@type'] = $(this).attr('type');
-            partGroup['@number'] = $(this).attr('number');
+            partGroup['@number'] = parseInt( $(this).attr('number') );
             partGroup['group-symbol'] = $(this).find('group-symbol').text();
 
             partList.push(partGroup);
@@ -78,7 +83,7 @@ Concerto.Converter.getPartList = function($xml) {
             
             var $scoreInstrument = $(this).find('score-instrument');
             scorePart['score-instrument'] = {
-                '@id': $scoreInstrument.attr('@id'),
+                '@id': $scoreInstrument.attr('id'),
                 'instrument-name': $scoreInstrument.find('instrument-name').text()
             };
 
@@ -129,6 +134,7 @@ Concerto.Converter.getPrintTag = function($print) {
     if($print.find('staff-layout').length > 0) {
         // musicxml xsd says staff-layout maxOccurs is unbounded. 
         // but I haven't found this case which multiple staff-layout occurs in an one print tag.
+        // --> It can be possible when three staff occurs...
         var $staffLayout = $print.find('staff-layout');
         var staffLayout = {
             '@number': parseInt( $staffLayout.attr('number') ),
@@ -186,7 +192,7 @@ Concerto.Converter.getAttributesTag = function($attributes) {
     var $key = $attributes.find('key');
     if($key.length > 0) {
         attributes['key'] = {
-            'fifths': $key.find('fifths').text()
+            'fifths': parseInt( $key.find('fifths').text() )
         };
         if($key.find('mode').length > 0) {
             attributes['mode'] = $key.find('mode').text();
@@ -322,8 +328,7 @@ Concerto.Converter.getForwardAndBackupTag = function($elem) {
 Concerto.Converter.getBarlineTag = function($barline) {
     var barline = {
         'tag': $barline.prop('tagName'),
-        'bar-style': $barline.find('bar-style').text(),
-        
+        'bar-style': $barline.find('bar-style').text()
     };
 
     if($barline.find('repeat').length > 0) {

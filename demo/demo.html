@@ -7,13 +7,13 @@
 
 <title>Concerto MusicXML Parser Demo</title>
 
-<script type="text/javascript" src="./../lib/raphael-min.js"></script>
-<script type="text/javascript" src="./../lib/vexflow-min.js"></script>
-<script type="text/javascript" src="./../lib/jquery-2.0.2.min.js"></script>
-
-
-<script type="text/javascript" src="./../build/concerto-min.js"></script>
+<script type="text/javascript" src="/bower_components/raphael/raphael-min.js"></script>
+<script type="text/javascript" src="/bower_components/vexflow/build/vexflow/vexflow-min.js"></script>
+<script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="/bower_components/tv4/tv4.js"></script>
 <!--
+<script type="text/javascript" src="./../build/concerto-min.js"></script>
+-->
 <script type="text/javascript" src="./../src/concerto.js"></script>
 <script type="text/javascript" src="./../src/table.js"></script>
 <script type="text/javascript" src="./../src/parser.js"></script>
@@ -23,7 +23,7 @@
 <script type="text/javascript" src="./../src/measuremanager.js"></script>
 <script type="text/javascript" src="./../src/barlinemanager.js"></script>
 <script type="text/javascript" src="./../src/converter.js"></script>
--->
+
 <script type="text/javascript">
 var musicjson;
 
@@ -36,13 +36,17 @@ var examples = [
     './examples/test_notations.xml'
 ];
 
-function onReady() {
+function onReady(schema) {
     // use xml example instead of using templates.js
     $.ajax({
         url: examples[5],
         data: null,
         success: function( data ) {
             musicjson = Concerto.Converter.toJSON(data);
+            var valid = tv4.validate(musicjson, schema);
+            if(valid) { console.log('pre-validation success'); }
+            else { console.log(tv4.error); }
+
             console.log(musicjson);
             var pageLayout = musicjson['defaults']['page-layout'];
             $("#content").css('width', pageLayout['page-width'])
@@ -63,14 +67,20 @@ function onReady() {
             ];
 
             musicjson = Concerto.Parser.parseAndDraw(pages, musicjson); 
-
+            var valid = tv4.validate(musicjson, schema);
+            if(valid) { console.log('post-validation success'); }
+            else { console.log(tv4.error); }
         },
         dataType: 'xml'
     });
     
 }
 
-$(document).ready(function() { onReady(); });
+$(document).ready(function() { 
+    $.getJSON('/schema/musicjson.json', function(schema) {
+        onReady(schema);
+    });
+});
 
 </script>
 </head>

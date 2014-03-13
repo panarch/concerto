@@ -7,6 +7,7 @@ module.exports = function(grunt) {
           '-W069': true
         },
         src: [
+          'schema/musicjson.json',
           'src/concerto.js',
           'src/table.js',
           'src/parser.js',
