@@ -12,19 +12,28 @@ demo/demo.html
 * Join the Concerto Project Google Group at:
   https://groups.google.com/forum/#!forum/concerto-project
 * Run 'grunt jshint' before sending, and make sure your code is lint-clean.
+* Update json-schema(in schema folder) when you add or modify structure of musicjson.
 * Please use 4 spaces instead of tabs.
 * Send in your changes via a GitHub pull request.
 
 
 ## Prerequisties (for Developers)
-For performing full builds, you need the following:
+For performing full builds and tests, you need the following:
 
 #### Grunt
 
-    $ node -g install grunt-cli
-    $ node install grunt-contrib-jshint
-    $ node install grunt-contrib-uglify
-    $ node install grunt-contrib-concat
+    $ npm install -g grunt-cli
+    $ npm install grunt-contrib-jshint
+    $ npm install grunt-contrib-uglify
+    $ npm install grunt-contrib-concat
+
+#### Bower
+
+    $ npm install -g bower
+    $ bower install jquery
+    $ bower install vexflow
+    $ bower install raphael
+    $ bower install tv4
 
 ## Build Instructions
 
