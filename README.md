@@ -23,9 +23,7 @@ For performing full builds and tests, you need the following:
 #### Grunt
 
     $ npm install -g grunt-cli
-    $ npm install grunt-contrib-jshint
-    $ npm install grunt-contrib-uglify
-    $ npm install grunt-contrib-concat
+    $ npm install
 
 #### Bower
 
