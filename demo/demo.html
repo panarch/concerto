@@ -7,24 +7,25 @@
 
 <title>Concerto MusicXML Parser Demo</title>
 
-<script type="text/javascript" src="/bower_components/raphael/raphael-min.js"></script>
-<script type="text/javascript" src="/bower_components/vexflow/build/vexflow/vexflow-min.js"></script>
-<script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
-<script type="text/javascript" src="/bower_components/tv4/tv4.js"></script>
+<script src="/bower_components/raphael/raphael-min.js"></script>
+<script src="/bower_components/vexflow/build/vexflow/vexflow-min.js"></script>
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/tv4/tv4.js"></script>
 <!--
-<script type="text/javascript" src="./../build/concerto-min.js"></script>
+<script src="./../build/concerto-min.js"></script>
 -->
-<script type="text/javascript" src="./../src/concerto.js"></script>
-<script type="text/javascript" src="./../src/table.js"></script>
-<script type="text/javascript" src="./../src/parser.js"></script>
-<script type="text/javascript" src="./../src/attributesmanager.js"></script>
-<script type="text/javascript" src="./../src/layoutmanager.js"></script>
-<script type="text/javascript" src="./../src/notemanager.js"></script>
-<script type="text/javascript" src="./../src/measuremanager.js"></script>
-<script type="text/javascript" src="./../src/barlinemanager.js"></script>
-<script type="text/javascript" src="./../src/converter.js"></script>
+<script src="./../src/concerto.js"></script>
+<script src="./../src/table.js"></script>
+<script src="./../src/parser.js"></script>
+<script src="./../src/attributesmanager.js"></script>
+<script src="./../src/layoutmanager.js"></script>
+<script src="./../src/notemanager.js"></script>
+<script src="./../src/measuremanager.js"></script>
+<script src="./../src/barlinemanager.js"></script>
+<script src="./../src/converter.js"></script>
+<script src="./../src/renderer.js"></script>
 
-<script type="text/javascript">
+<script>
 var musicjson;
 
 var examples = [
@@ -39,7 +40,7 @@ var examples = [
 function onReady(schema) {
     // use xml example instead of using templates.js
     $.ajax({
-        url: examples[5],
+        url: examples[4],
         data: null,
         success: function( data ) {
             musicjson = Concerto.Converter.toJSON(data);
@@ -48,25 +49,9 @@ function onReady(schema) {
             else { console.log(tv4.error); }
 
             console.log(musicjson);
-            var pageLayout = musicjson['defaults']['page-layout'];
-            $("#content").css('width', pageLayout['page-width'])
-                         .css('height', pageLayout['page-height']);
-            $("#content").find('svg').remove();
-
-            $("#content2").css('width', pageLayout['page-width'])
-                         .css('height', pageLayout['page-height']);
-            $("#content2").find('svg').remove();
-            var renderer = new Vex.Flow.Renderer("content", Vex.Flow.Renderer.Backends.RAPHAEL);
-            var ctx = renderer.getContext();
-
-            var renderer = new Vex.Flow.Renderer("content2", Vex.Flow.Renderer.Backends.RAPHAEL);
-            var ctx2 = renderer.getContext();
-
-            var pages = [
-                ctx, ctx2, undefined, undefined, undefined
-            ];
-
-            musicjson = Concerto.Parser.parseAndDraw(pages, musicjson); 
+            var $container = $("#container");
+            var renderer = new Concerto.Renderer($container, musicjson);
+            renderer.draw();
             var valid = tv4.validate(musicjson, schema);
             if(valid) { console.log('post-validation success'); }
             else { console.log(tv4.error); }
@@ -83,12 +68,23 @@ $(document).ready(function() {
 });
 
 </script>
+<style type="text/css">
+#container {
+    width:100%;
+    text-align:center;
+}
+
+#container > div {
+    background-color:#eed;
+    margin:auto;
+    margin-bottom:10px;
+}
+
+</style>
 </head>
-<body style="text-align:center;">
-    <div id="content" style="width:300px;height:600px;background-color:#eed;margin:auto;">
-    </div>
-    <div style="height:30px;"></div>
-    <div id="content2" style="width:300px;height:600px;background-color:#eed;margin:auto;">
+<body>
+    <div id="container">
     </div>
 </body>
 </html>
+

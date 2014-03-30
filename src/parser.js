@@ -13,6 +13,38 @@ Concerto.Parser = {};
 */
 
 /**
+ * @param {Object} musicjson
+ * @return {integer}
+ */
+Concerto.Parser.getNumPages = function(musicjson) {
+    var measures = musicjson['part'][0]['measure'];
+    var num = 1;
+    for(var i = 0; i < measures.length; i++) {
+        var measure = measures[i];
+        if(measure['print'] && measure['print']['@new-page']) {
+            num++;
+        }
+    }
+
+    return num;
+};
+
+/**
+ * @param {Object} musicjson
+ * @return {Object.<string, number>}
+ */
+Concerto.Parser.getPageSize = function(musicjson) {
+    var pageLayout = musicjson['defaults']['page-layout'];
+            $("#content").css('width', pageLayout['page-width'])
+                         .css('height', pageLayout['page-height']);
+            $("#content").find('svg').remove();
+    return {
+        width: pageLayout['page-width'],
+        height: pageLayout['page-height']
+    }
+};
+
+/**
  * @param {Array} notes
  * @return {Array}
  */
