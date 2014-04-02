@@ -35,13 +35,13 @@ Concerto.Parser.getNumPages = function(musicjson) {
  */
 Concerto.Parser.getPageSize = function(musicjson) {
     var pageLayout = musicjson['defaults']['page-layout'];
-            $("#content").css('width', pageLayout['page-width'])
-                         .css('height', pageLayout['page-height']);
-            $("#content").find('svg').remove();
+    $("#content").css('width', pageLayout['page-width'])
+                 .css('height', pageLayout['page-height']);
+    $("#content").find('svg').remove();
     return {
         width: pageLayout['page-width'],
         height: pageLayout['page-height']
-    }
+    };
 };
 
 /**
