@@ -96,6 +96,9 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
         stave = staves[staff - 1];
 
         var notes = this.notesList[i];
+        if(notes.length === 0) {
+            continue;
+        }
         var voice = new Vex.Flow.Voice({ num_beats: time['beats'],
                                         beat_value: time['beat-type'],
                                         resolution: Vex.Flow.RESOLUTION});
@@ -113,9 +116,11 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
         }
     }
 
-    formatter = new Vex.Flow.Formatter();
-    formatter.joinVoices(staffVoices);
-    formatter.formatToStave(staffVoices, stave);
+    if(staffVoices.length > 0) {
+        formatter = new Vex.Flow.Formatter();
+        formatter.joinVoices(staffVoices);
+        formatter.formatToStave(staffVoices, stave);
+    }
 
     return voices;
 };
