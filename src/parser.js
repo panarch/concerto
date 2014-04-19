@@ -155,27 +155,30 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
             var noteManager = new Concerto.Parser.NoteManager(attributesManager);
             var note, clef;
 
+            var clefExists = false;
+            var isAttributes = false;
             if(notes.length > 0) {
                 note = notes[0];
-                var isAttributes = (note['tag'] == 'attributes');
-                var clefExists = false;
+                isAttributes = (note['tag'] == 'attributes');
                 if(isAttributes && note['clef']) {
                     // set raw clefs, and get converted clef
                     attributesManager.setClefs(note['clef'], p);
                     clefExists = true;
                 }
-                
-                if(measure['print'] || clefExists) {
-                    for(k = 0; k < curStaves.length; k++) {
-                        var staff = k + 1;
-                        clef = attributesManager.getClef(p, staff);
-                        if(clef !== undefined) {
-                            curStaves[k].addClef(clef);
-                        }
+            }
+
+            if(measure['print'] || clefExists) {
+                for(k = 0; k < curStaves.length; k++) {
+                    var staff = k + 1;
+                    clef = attributesManager.getClef(p, staff);
+                    if(clef !== undefined) {
+                        curStaves[k].addClef(clef);
                     }
                 }
+            }
 
-                if(isAttributes && note['key']) {
+            if(isAttributes > 0) {
+                if(note['key']) {
                     attributesManager.setKeySignature(note['key'], p, note['staff']);
                     Concerto.Parser.AttributesManager.addKeySignatureToStave(stave, note['key']);
                     if(stave2) {
@@ -183,7 +186,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                     }
                 }
 
-                if(isAttributes && note['time']) {
+                if(note['time']) {
                     attributesManager.setTimeSignature(note['time']);
                     Concerto.Parser.AttributesManager.addTimeSignatureToStave(stave, note['time']);
                     if(stave2) {
@@ -191,7 +194,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                     }
                 }
 
-                if(isAttributes && note['divisions']) {
+                if(note['divisions']) {
                     attributesManager.setDivisions(note['divisions']);
                     divisions = note['divisions'];
                 }    
