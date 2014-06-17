@@ -223,6 +223,15 @@ Concerto.Converter.getNoteTag = function($note) {
     else {
         var $stem = $note.find('stem');
         if($stem.length > 0) {
+            /***
+             |
+             |
+            O   --> down
+
+             O
+            |
+            |   --> up
+            ***/
             note['stem'] = ($stem.text() == 'down') ? 'up' : 'down';
         }
 

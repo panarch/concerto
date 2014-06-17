@@ -264,14 +264,14 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                 continue;
             }
             stave.setContext(ctx).draw();
-            measure['top-line-y'] = stave.getYForLine(0);
+            measure['top-line-y'] = stave.getYForLine(0) + 1;
             measure['top-y'] = stave.y;
-            measure['bottom-line-y'] = stave.getYForLine(stave.options.num_lines - 1);
+            measure['bottom-line-y'] = stave.getYForLine(stave.options.num_lines - 1) + 1;
             measure['bottom-y'] = stave.getBottomY();
             if(stave2) {
                 //stave2.y = measure['bottom-line-y'] + measure['print']['staff-layout']['staff-distance'];
                 stave2.setContext(ctx).draw();
-                measure['bottom-line-y'] = stave2.getYForLine(stave2.options.num_lines - 1);
+                measure['bottom-line-y'] = stave2.getYForLine(stave2.options.num_lines - 1) + 1;
                 measure['bottom-y'] = stave2.getBottomY();
             }
         }
