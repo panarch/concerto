@@ -1,4 +1,17 @@
 module.exports = function(grunt) {
+  var files = [
+    'src/concerto.js',
+    'src/table.js',
+    'src/parser.js',
+    'src/attributesmanager.js',
+    'src/layoutmanager.js',
+    'src/notemanager.js',
+    'src/measuremanager.js',
+    'src/barlinemanager.js',
+    'src/renderer.js',
+    'src/converter.js'
+  ];
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     jshint: {
@@ -6,18 +19,7 @@ module.exports = function(grunt) {
         options: {
           '-W069': true
         },
-        src: [
-          'schema/musicjson.json',
-          'src/concerto.js',
-          'src/table.js',
-          'src/parser.js',
-          'src/attributesmanager.js',
-          'src/layoutmanager.js',
-          'src/notemanager.js',
-          'src/measuremanager.js',
-          'src/barlinemanager.js',
-          'src/converter.js'
-        ]
+        src: files.concat('schema/musicjson.json')
       }
     },
     uglify: {
@@ -26,17 +28,7 @@ module.exports = function(grunt) {
       },
       my_target: {
         files: {
-          'build/concerto-min.js': [
-            'src/concerto.js',
-            'src/table.js',
-            'src/parser.js',
-            'src/attributesmanager.js',
-            'src/layoutmanager.js',
-            'src/notemanager.js',
-            'src/measuremanager.js',
-            'src/barlinemanager.js',
-            'src/converter.js'
-          ]
+          'build/concerto-min.js': files
         }
       }
     },
