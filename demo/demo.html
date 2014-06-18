@@ -34,13 +34,14 @@ var examples = [
     './examples/adeste.xml',
     './examples/inv4.xml',
     './examples/inv1.xml',
-    './examples/test_notations.xml'
+    './examples/test_notations.xml',
+    './examples/blank_a7.xml'
 ];
 
 function onReady(schema) {
     // use xml example instead of using templates.js
     $.ajax({
-        url: examples[4],
+        url: examples[6],
         data: null,
         success: function( data ) {
             musicjson = Concerto.Converter.toJSON(data);
