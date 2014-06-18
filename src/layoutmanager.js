@@ -97,9 +97,9 @@ Concerto.Parser.LayoutManager.prototype.getStavePositions = function(measure, le
                 Concerto.logError('Unhandled layout state');
             }
         }
-        else if(print['staff-layout']) {
+        else if(print['staff-layout'].length > 0) {
             // new system, staff
-            measure['y'] = aboveMeasure['bottom-line-y'] + print['staff-layout']['staff-distance'];
+            measure['y'] = aboveMeasure['bottom-line-y'] + print['staff-layout'][0]['staff-distance'];
         }
         else {
             Concerto.logError('Lack of print tag');
@@ -115,8 +115,9 @@ Concerto.Parser.LayoutManager.prototype.getStavePositions = function(measure, le
 
     // check first measure's print
     print = firstMeasure['print'];
-    if(print['staff-layout'] && print['staff-layout']['@number'] == 2) {
-        var y = measure['y'] + 40 + print['staff-layout']['staff-distance'];
+    //if(print['staff-layout'] && print['staff-layout']['@number'] == 2) {
+    if(print['staff-layout'] && print['staff-layout'].length > 1) {
+        var y = measure['y'] + 40 + print['staff-layout'][1]['staff-distance'];
         position = {
             'x': measure['x'],
             'y': y

@@ -135,12 +135,16 @@ Concerto.Converter.getPrintTag = function($print) {
         // musicxml xsd says staff-layout maxOccurs is unbounded. 
         // but I haven't found this case which multiple staff-layout occurs in an one print tag.
         // --> It can be possible when three staff occurs...
-        var $staffLayout = $print.find('staff-layout');
-        var staffLayout = {
-            '@number': parseInt( $staffLayout.attr('number') ),
-            'staff-distance': parseFloat( $staffLayout.find('staff-distance').text() )
-        };
-        print['staff-layout'] = staffLayout;
+        // --> It was my mistake, staff-layout can occur multiple times.
+        print['staff-layout'] = [];
+
+        $print.find('staff-layout').each(function() {
+            var staffLayout = {
+                '@number': parseInt( $(this).attr('number') ),
+                'staff-distance': parseFloat( $(this).find('staff-distance').text() )
+            };
+            print['staff-layout'].push(staffLayout);
+        });
     }
     return print;
 };
