@@ -116,15 +116,29 @@ Concerto.Parser.LayoutManager.prototype.getStavePositions = function(measure, le
     // check first measure's print
     print = firstMeasure['print'];
     //if(print['staff-layout'] && print['staff-layout']['@number'] == 2) {
-    if(print['staff-layout'] && print['staff-layout'].length > 1) {
-        var y = measure['y'] + 40 + print['staff-layout'][1]['staff-distance'];
-        position = {
-            'x': measure['x'],
-            'y': y
-        };
-        measure['y2'] = y;
-        positions.push(position);
+    if(!print['staff-layout']) {
+        return positions;
     }
+
+    var staffDistance;
+    if(print['staff-layout'].length > 1) {
+        staffDistance = print['staff-layout'][1]['staff-distance'];
+    }
+    else if(print['system-layout'] && print['staff-layout'].length > 0) {
+        staffDistance = print['staff-layout'][0]['staff-distance'];
+    }
+    else {
+        Concerto.logError('Wrong staff-layout.');
+        return positions;
+    }
+
+    var y = measure['y'] + 40 + staffDistance;
+    position = {
+        'x': measure['x'],
+        'y': y
+    };
+    measure['y2'] = y;
+    positions.push(position);
 
     return positions;
 };
