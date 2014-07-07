@@ -19,8 +19,8 @@ Concerto.Renderer = function($container, musicjson, options) {
     var pages = [];
     var doms = [];
     for(var i = 0; i < numPages; i++) {
-        var divId = 'content' + i;
-        var $div = $('<div>', {id: divId});
+        var $div = $('<div>');
+        $div.addClass('content' + i);
         
         var size = Concerto.Parser.getPageSize(musicjson);
         $div.css('width', size.width)
@@ -28,7 +28,7 @@ Concerto.Renderer = function($container, musicjson, options) {
 
         $container.append($div);
         
-        var vexflowRenderer = new Vex.Flow.Renderer(divId, backends);
+        var vexflowRenderer = new Vex.Flow.Renderer($div[0], backends);
         var ctx = vexflowRenderer.getContext();
         pages.push(ctx);
         doms.push($div);
