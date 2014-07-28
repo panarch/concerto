@@ -81,6 +81,35 @@ Concerto.Parser.NoteManager.prototype.addForward = function(duration) {
 };
 
 /**
+ * @this {Concerto.Parser.NoteManager}
+ * @param {Object}
+ * @param {Array.<Object>}
+ */
+Concerto.Parser.NoteManager.prototype.fillVoice = function(time, notes) {
+    var divisions = this.attributesManager.getDivisions();
+    var maxDuration = divisions * 4 / time['beat-type'] * time['beats'];
+
+    var duration = 0;
+    for(var i = 0; i < notes.length; i++) {
+        var staveNote = notes[i];
+        duration += Concerto.Parser.NoteManager.getDurationFromStaveNote(staveNote, divisions);
+    }
+
+    duration = maxDuration - duration;
+    if(duration < 0) {
+        Concerto.logWarn('Sum of duration exceeds time sig');
+        return;
+    }
+    else if(duration === 0) {
+        return;
+    }
+
+    var noteType = Concerto.Parser.NoteManager.getStaveNoteTypeFromDuration(duration, divisions);
+    var ghostNote = new Vex.Flow.GhostNote({ duration: noteType });
+    notes.push(ghostNote);
+};
+
+/**
  * @this {Array.<Object>}
  * @return {Array}
  */
@@ -103,6 +132,7 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
                                         beat_value: time['beat-type'],
                                         resolution: Vex.Flow.RESOLUTION});
         voice.setMode(Vex.Flow.Voice.Mode.SOFT);
+        this.fillVoice(time, notes);
         voice = voice.addTickables(notes);
         voices.push([voice, stave]);
         if(preStaff != staff) {
@@ -127,6 +157,29 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
 
 
 // static functions
+
+/**
+ * @param {string} noteType
+ * @param {number} divisions
+ * @return {number}
+ */ 
+Concerto.Parser.NoteManager.getDurationFromStaveNote = function(staveNote, divisions) {
+    var noteType = staveNote.getDuration();
+    var numDots;
+    if(staveNote['-concerto-num-dots']) {
+        numDots = staveNote['-concerto-num-dots'];
+    }
+    else {
+        numDots = 0;
+    }
+
+    var index = Concerto.Table.NOTE_VEX_TYPES.indexOf(noteType);
+    var offset = index - Concerto.Table.NOTE_VEX_QUARTER_INDEX;
+    var duration = Math.pow(2, offset) * divisions;
+    duration = duration * 2 - duration * Math.pow(2, -numDots);
+
+    return duration;
+};
 
 /**
  * @param {number} duration
@@ -301,7 +354,7 @@ Concerto.Parser.NoteManager.getStaveNote = function(notes, clef, divisions) {
             duration += 'd';
         }
     }
-    
+
     var staveNote = new Vex.Flow.StaveNote({ keys: keys, duration: duration, clef: clef });
     
     for(i = 0; i < accidentals.length; i++) {
@@ -309,6 +362,8 @@ Concerto.Parser.NoteManager.getStaveNote = function(notes, clef, divisions) {
             staveNote.addAccidental(i, new Vex.Flow.Accidental( accidentals[i] ));
         }
     }
+
+    staveNote['-concerto-num-dots'] = baseNote['dot'];
 
     if(baseNote['dot']) {
         for(i = 0; i < baseNote['dot']; i++) {
