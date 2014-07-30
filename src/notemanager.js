@@ -138,8 +138,10 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
         if(preStaff != staff) {
             formatter = new Vex.Flow.Formatter();
             formatter.joinVoices(staffVoices);
-            formatter.formatToStave(staffVoices, stave);
+            formatter.formatToStave(staffVoices, stave, { align_rests: true });
             staffVoices = [voice];
+
+            preStaff = staff;
         }
         else {
             staffVoices.push(voice);
@@ -149,7 +151,7 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
     if(staffVoices.length > 0) {
         formatter = new Vex.Flow.Formatter();
         formatter.joinVoices(staffVoices);
-        formatter.formatToStave(staffVoices, stave);
+        formatter.formatToStave(staffVoices, stave, { align_rests: true });
     }
 
     return voices;
