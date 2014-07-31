@@ -136,11 +136,8 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
         voice = voice.addTickables(notes);
         voices.push([voice, stave]);
         if(preStaff != staff) {
-            formatter = new Vex.Flow.Formatter();
-            formatter.joinVoices(staffVoices);
-            formatter.formatToStave(staffVoices, stave, { align_rests: true });
+            _format(staffVoices, stave);
             staffVoices = [voice];
-
             preStaff = staff;
         }
         else {
@@ -149,9 +146,21 @@ Concerto.Parser.NoteManager.prototype.getVoices = function(staves) {
     }
 
     if(staffVoices.length > 0) {
+        _format(staffVoices, stave);
+    }
+
+    function _format(staffVoices, stave) {
+        var options = {};
+        if(staffVoices.length > 1) {
+            options.align_rests = true;
+        }
+        else {
+            options.align_rests = false;
+        }
+
         formatter = new Vex.Flow.Formatter();
         formatter.joinVoices(staffVoices);
-        formatter.formatToStave(staffVoices, stave, { align_rests: true });
+        formatter.formatToStave(staffVoices, stave, options);
     }
 
     return voices;
