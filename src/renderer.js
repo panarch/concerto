@@ -90,7 +90,10 @@ Concerto.Renderer.prototype.clear = function(page) {
     for(var i = 0; i < this.doms.length; i++) {
         if(all || page === i) {
             var $dom = this.doms[i];
-            $dom.find('svg').empty();
+            var $svg = $dom.find('svg');
+            $svg.empty();
+            $svg.attr('width', this.pageSize.width)
+                .attr('height', this.pageSize.height);
         }
     }
 };
