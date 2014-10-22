@@ -21,7 +21,7 @@
     "grunt-contrib-concat": "~0.3.0"
   },
   "description": "A Javascript library for rendering MusicXML using MusicJSON and Vexflow. Copyright (c) 2014 Taehoon Moon",
-  "main": "Gruntfile.js",
+  "main": "build/concerto-min.js",
   "dependencies": {
     "grunt": "~0.4.4",
     "grunt-contrib-concat": "~0.3.0",
