@@ -1,3 +1,6 @@
+define(function(require, exports, module) {
+var $ = require("jquery");
+var Vex = require("concerto/vexflow");
 /*! concerto - v0.1.0 | 2014-10-23 | (c) Taehoon Moon 2014, 2014 | https://raw.github.com/panarch/concerto/master/LICENSE */
 function Concerto() {}
 
@@ -667,3 +670,5 @@ Concerto.Parser.AttributesManager.addKeySignatureToStave = function(stave, keyDi
     var musicxml = "";
     return musicxml;
 };
+module.exports = Concerto;
+});
