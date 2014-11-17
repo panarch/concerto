@@ -78,12 +78,25 @@ Concerto.Parser.getBeams = function(notes) {
  * @param {Object} ctx
  */
 Concerto.Parser.drawVoices = function(voices, ctx) {
-    for(var i = 0; i < voices.length; i++) {
+    if(voices.length === 0) {
+        return;
+    }
+
+    var _voices = [];
+    var stave = voices[0][1];
+    var justifyWidth = stave.getNoteEndX() - stave.getNoteStartX() - 10;
+
+    var i;
+
+    for(i = 0; i < voices.length; i++) {
+        _voices.push(voices[i][0]);
+    }
+    //var formatter = new Vex.Flow.Formatter();
+    //formatter.joinVoices(_voices).format(_voices, justifyWidth, { align_rests: false });
+
+    for(i = 0; i < voices.length; i++) {
         var voice = voices[i][0];
-        var stave = voices[i][1];
-        var formatter = new Vex.Flow.Formatter();
-        //formatter.joinVoices([voice]);
-        //formatter.formatToStave([voice], stave);
+        stave = voices[i][1];
         voice.draw(ctx, stave);
     }
 };
@@ -156,13 +169,14 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
             var note, clef;
 
             var clefExists = false;
+            var changedStaffs;
             var isAttributes = false;
             if(notes.length > 0) {
                 note = notes[0];
                 isAttributes = (note['tag'] == 'attributes');
                 if(isAttributes && note['clef']) {
                     // set raw clefs, and get converted clef
-                    attributesManager.setClefs(note['clef'], p);
+                    changedStaffs = attributesManager.setClefs(note['clef'], p);
                     clefExists = true;
                 }
             }
@@ -170,6 +184,9 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
             if(measure['print'] || clefExists) {
                 for(k = 0; k < curStaves.length; k++) {
                     var staff = k + 1;
+                    if(changedStaffs.indexOf(staff) === -1)
+                        continue;
+
                     clef = attributesManager.getClef(p, staff);
                     if(clef !== undefined) {
                         curStaves[k].addClef(clef);
@@ -208,7 +225,7 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
                     if(note['clef']) {
                         attributesManager.setClefs(note['clef'], p);
 
-                        if(note[j + 1] === undefined) {
+                        if(notes[j + 1] === undefined) {
                             Concerto.Parser.AttributesManager.addEndClefToStave(curStaves, note['clef']);
                         }
                         else {

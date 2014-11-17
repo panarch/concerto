@@ -62,10 +62,11 @@ Concerto.Parser.AttributesManager.prototype.setClefs = function(rawClefs, part) 
         this.clefDict[part] = {};
     }
 
+    var changedStaffs = [];
+
     for(var i = 0; i < rawClefs.length; i++) {
         var rawClef = rawClefs[i];
-        var clefSign = rawClef['sign'];
-        var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
+        var clef = Concerto.Parser.AttributesManager.getVexClef(rawClef);
         
         if(clef === undefined) {
             Concerto.logError('Unsupported clef sign: ' + clefSign);
@@ -80,7 +81,10 @@ Concerto.Parser.AttributesManager.prototype.setClefs = function(rawClefs, part) 
             staff = 1;
         }
         this.clefDict[part][staff] = clef;
+        changedStaffs.push(staff);
     }
+
+    return changedStaffs;
 };
 
 /**
@@ -247,8 +251,7 @@ Concerto.Parser.AttributesManager.addTimeSignatureToStave = function(stave, time
 Concerto.Parser.AttributesManager.addEndClefToStave = function(staves, rawClefs) {
     for(var i = 0; i < rawClefs.length; i++) {
         var rawClef = rawClefs[i];
-        var clefSign = rawClef['sign'];
-        var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
+        var clef = Concerto.Parser.AttributesManager.getVexClef(rawClef);
         clef += '_small';
         if(rawClef['@number'] == 1) {
             staves[0].addEndClef(clef);
@@ -264,10 +267,19 @@ Concerto.Parser.AttributesManager.addEndClefToStave = function(staves, rawClefs)
  * @return {Object} clefNote;
  */
 Concerto.Parser.AttributesManager.getClefNote = function(rawClefs) {
-    var clefSign = rawClefs[0]['sign'];
-    var clef = Concerto.Table.CLEF_TYPE_DICT[clefSign];
+    var clef = Concerto.Parser.AttributesManager.getVexClef(rawClefs[0]);
     clef += '_small';
     var clefNote = new Vex.Flow.ClefNote(clef);
     return clefNote;
+};
+
+/**
+ * @param {Object} rawClef
+ * @return {string} clef
+ */
+Concerto.Parser.AttributesManager.getVexClef = function(rawClef) {
+    var clefKey = rawClef['sign'] + '/' + rawClef['line'];
+    var clef = Concerto.Table.CLEF_TYPE_DICT[clefKey];
+    return clef;
 };
 

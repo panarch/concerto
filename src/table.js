@@ -55,8 +55,31 @@ Concerto.Table.NOTE_VEX_TYPE_DICT = {
 };
 
 Concerto.Table.CLEF_TYPE_DICT = {
-    'G': 'treble',
-    'F': 'bass'
+    'G/2': 'treble',
+    'F/4': 'bass',
+    'C/3': 'alto',
+    'C/4': 'tenor',
+    'C/1': 'soprano',
+    'C/2': 'mezzo-soprano',
+    'C/5': 'baritone-c',
+    'F/3': 'baritone-f',
+    'F/5': 'subbass',
+    'G/1': 'french',
+    'percussion/2': 'percussion'
+};
+
+Concerto.Table.CLEF_VEX_TYPE_DICT = {
+    'treble'        : { sign: 'G', line: 2 },
+    'bass'          : { sign: 'F', line: 4 },
+    'alto'          : { sign: 'C', line: 3 },
+    'tenor'         : { sign: 'C', line: 4 },
+    'soprano'       : { sign: 'C', line: 1 },
+    'mezzo-soprano' : { sign: 'C', line: 2 },
+    'baritone-c'    : { sign: 'C', line: 5 },
+    'baritone-f'    : { sign: 'F', line: 3 },
+    'subbass'       : { sign: 'F', line: 5 },
+    'french'        : { sign: 'G', line: 1 },
+    'percussion'    : { sign: 'percussion', line: 2 }
 };
 
 Concerto.Table.STAVE_DEFAULT_OPTIONS = {
