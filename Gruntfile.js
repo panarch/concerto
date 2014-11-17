@@ -63,7 +63,8 @@ module.exports = function(grunt) {
         options: {
             stripBanners: false,
             banner: 'define(function(require, exports, module) {\n' +
-              'var $ = require("jquery");\n',
+              'var $ = require("jquery");\n' +
+              'var Raphael = require("raphael");\n',
             footer: '\nmodule.exports = Vex;\n});'
         },
         src: [
