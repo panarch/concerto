@@ -1,5 +1,6 @@
 define(function(require, exports, module) {
 var $ = require("jquery");
+var Raphael = require("raphael");
 /**
  * VexFlow Engraver 1.2 Custom
  * A library for rendering musical notation and guitar tablature in HTML5.
