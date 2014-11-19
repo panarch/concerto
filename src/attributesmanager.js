@@ -199,11 +199,14 @@ Concerto.Parser.AttributesManager.addClefToStave = function(stave, clef) {
  * @param {Object} stave
  * @param {Object} keyDict
  */
-Concerto.Parser.AttributesManager.addKeySignatureToStave = function(stave, keyDict) {
+Concerto.Parser.AttributesManager.addKeySignatureToStave = function(stave, keyDict, clef) {
     if(keyDict['fifths'] === undefined) {
         Concerto.logError('key fifths does not exists');
         return;
     }
+
+    if (clef)
+        stave.clef = clef;
 
     var fifths = keyDict['fifths'];
     var keySpec;

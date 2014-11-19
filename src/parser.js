@@ -197,9 +197,11 @@ Concerto.Parser.parseAndDraw = function(pages, musicjson) {
             if(isAttributes > 0) {
                 if(note['key']) {
                     attributesManager.setKeySignature(note['key'], p, note['staff']);
-                    Concerto.Parser.AttributesManager.addKeySignatureToStave(stave, note['key']);
+                    var _clef = attributesManager.getClef(p, 1, 'treble');
+                    Concerto.Parser.AttributesManager.addKeySignatureToStave(stave, note['key'], _clef);
                     if(stave2) {
-                        Concerto.Parser.AttributesManager.addKeySignatureToStave(stave2, note['key']);
+                        _clef = attributesManager.getClef(p, 2, 'treble');
+                        Concerto.Parser.AttributesManager.addKeySignatureToStave(stave2, note['key'], _clef);
                     }
                 }
 
