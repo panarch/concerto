@@ -28,10 +28,7 @@ For performing full builds and tests, you need the following:
 #### Bower
 
     $ npm install -g bower
-    $ bower install jquery
-    $ bower install vexflow
-    $ bower install raphael
-    $ bower install tv4
+    $ bower install
 
 ## Build Instructions
 
