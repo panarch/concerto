@@ -113,7 +113,7 @@ define(function(require, exports, module) {
      * @return {Object}
      */
     Parser.parseAndDraw = function parseAndDraw(pages, musicjson) {
-        L.debug('parseAndDraw!');
+        L.debug('Begin parsing & drawing');
         var parts = musicjson['part'];
 
         var attributesManager = new AttributesManager();
@@ -135,7 +135,6 @@ define(function(require, exports, module) {
         var j;
         var k;
 
-        L.debug('num measures: ' + numMeasures);
         for (i = 0; i < numMeasures; i++) {
             measureManager.setMeasureIndex(i);
             attributesManager.setMeasureIndex(i);
@@ -312,6 +311,7 @@ define(function(require, exports, module) {
             }
         }
 
+        L.debug('Finished');
         return musicjson;
     };
 
