@@ -4,6 +4,7 @@ module.exports = {
   },
   target: [
     'src/**/**.js',
+    'demo/**.js',
     'schema/musicjson.json'
   ]
 };

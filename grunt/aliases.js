@@ -7,6 +7,13 @@ module.exports = function (grunt) {
     'concat'
   ]);
 
+  grunt.registerTask('serve', [
+    'jscs',
+    'eslint',
+    'connect:livereload',
+    'watch'
+  ]);
+
   grunt.registerTask('lint', [
     'jscs',
     'eslint'

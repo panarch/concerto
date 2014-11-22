@@ -7,14 +7,13 @@
 
 define(function(require, exports, module) {
     var $ = require('jquery');
-    var L = require('js-logger').get('Concerto');
-    L.debug('awiefjaiwejfaiwjefiawjefiwef');
-    alert('awefawef');
+    var Logger = require('js-logger');
+    Logger.useDefaults();
+    var L = Logger.get('main');
     var Converter = require('Converter');
     var Renderer = require('Renderer');
 
     var musicjson;
-    console.log('what the');
 
     /*
     var examples = [
@@ -28,14 +27,13 @@ define(function(require, exports, module) {
     ];
     */
 
-    alert('!!!');
     function load(url) {
         L.debug('load...... ' + url);
         // use xml example instead of using templates.js
         $.ajax({
             url: url,
             data: null,
-            success: function( data ) {
+            success: function(data) {
                 musicjson = Converter.toJSON(data);
                 /*
                 var valid = tv4.validate(musicjson, schema);
@@ -57,7 +55,7 @@ define(function(require, exports, module) {
     }
 
     /*
-    $(document).ready(function() { 
+    $(document).ready(function() {
         $.getJSON('/schema/musicjson.json', function(schema) {
             onReady(schema);
         });
