@@ -17,7 +17,7 @@ define(function(require, exports, module) {
     function AttributesManager() {
         this.time = {
             'beats': Table.DEFAULT_TIME_BEATS,
-            'beat-type': Table.DEFAULT_TIME_BEAT_TYPE 
+            'beat-type': Table.DEFAULT_TIME_BEAT_TYPE
         };
         this.divisions = 1;
         this.keyDict = {};
@@ -34,25 +34,21 @@ define(function(require, exports, module) {
      * @param {string} clef
      */
     AttributesManager.prototype.setClef = function setClef(part, staff, clef) {
-        if(this.clefDict[part] === undefined) {
+        if (this.clefDict[part] === undefined)
             this.clefDict[part] = {};
-        }
 
-        if(staff === undefined) {
+        if (staff === undefined) {
             staff = 1;
             this.clefDict[part][staff] = clef;
         }
-        else {
-            if(staff == 1) {
+        else
+            if (staff === 1) {
                 this.clefDict[part][staff] = clef;
-                if(this.clefDict[part][2] === undefined) {
+                if (this.clefDict[part][2] === undefined)
                     this.clefDict[part][2] = clef;
-                }
             }
-            else {
+            else
                 this.clefDict[part][staff] = clef;
-            }
-        }
     };
 
     /**
@@ -62,28 +58,26 @@ define(function(require, exports, module) {
      * @param {number} part
      */
     AttributesManager.prototype.setClefs = function setClefs(rawClefs, part) {
-        if(this.clefDict[part] === undefined) {
+        if (this.clefDict[part] === undefined)
             this.clefDict[part] = {};
-        }
 
         var changedStaffs = [];
 
-        for(var i = 0; i < rawClefs.length; i++) {
+        for (var i = 0; i < rawClefs.length; i++) {
             var rawClef = rawClefs[i];
             var clef = AttributesManager.getVexClef(rawClef);
-        
-            if(clef === undefined) {
-                L.error('Unsupported clef sign: ' + clefSign);
+
+            if (clef === undefined) {
+                L.error('Unsupported clef sign: ' + clef);
                 clef = Table.DEFAULT_CLEF;
             }
 
             var staff;
-            if(rawClef['@number'] !== undefined) {
+            if (rawClef['@number'] !== undefined)
                 staff = rawClef['@number'];
-            }
-            else {
+            else
                 staff = 1;
-            }
+
             this.clefDict[part][staff] = clef;
             changedStaffs.push(staff);
         }
@@ -100,12 +94,12 @@ define(function(require, exports, module) {
      * @return {string} clef
      */
     AttributesManager.prototype.getClef = function getClef(part, staff, defaultClef) {
-        if(staff === undefined) {
+        if (staff === undefined)
             staff = 1;
-        }
-        if(this.clefDict[part] === undefined || this.clefDict[part][staff] === undefined) {
+
+        if (this.clefDict[part] === undefined || this.clefDict[part][staff] === undefined)
             return defaultClef;
-        }
+
         return this.clefDict[part][staff];
     };
 
@@ -116,12 +110,12 @@ define(function(require, exports, module) {
      * @param {number=} staff
      */
     AttributesManager.prototype.setKeySignature = function setKeySignature(key, part, staff) {
-        if(staff === undefined) {
+        if (staff === undefined)
             staff = 1;
-        }
-        if(this.keyDict[part] === undefined) {
+
+        if (this.keyDict[part] === undefined)
             this.keyDict[part] = {};
-        }
+
         this.keyDict[part][staff] = key;
     };
 
@@ -132,9 +126,9 @@ define(function(require, exports, module) {
      * @return {Object}
      */
     AttributesManager.prototype.getKeySignature = function getKeySignature(part, staff) {
-        if(staff === undefined) {
+        if (staff === undefined)
             staff = 1;
-        }
+
         return this.keyDict[part][staff];
     };
 
@@ -156,7 +150,7 @@ define(function(require, exports, module) {
 
     /**
      * @this {AttributesManager}
-     * @param {Object.<string, number>}
+     * @param {Object.<string, number>} time
      */
     AttributesManager.prototype.setTimeSignature = function setTimeSignature(time) {
         this.time = time;
@@ -194,9 +188,7 @@ define(function(require, exports, module) {
      * @param {string} defaultClef
      */
     AttributesManager.addClefToStave = function addClefToStave(stave, clef) {
-        if(clef === undefined) {
-
-        }
+        //if (clef === undefined) {}
     };
 
     /**
@@ -204,7 +196,7 @@ define(function(require, exports, module) {
      * @param {Object} keyDict
      */
     AttributesManager.addKeySignatureToStave = function addKeySignatureToStave(stave, keyDict, clef) {
-        if(keyDict['fifths'] === undefined) {
+        if (keyDict['fifths'] === undefined) {
             L.error('key fifths does not exists');
             return;
         }
@@ -215,15 +207,13 @@ define(function(require, exports, module) {
         var fifths = keyDict['fifths'];
         var keySpec;
 
-        if(fifths === 0) {
+        if (fifths === 0)
             keySpec = 'C';
-        }
-        else if(fifths > 0) {
+        else if (fifths > 0)
             keySpec = Table.SHARP_MAJOR_KEY_SIGNATURES[fifths - 1];
-        }
-        else {
+        else
             keySpec = Table.FLAT_MAJOR_KEY_SIGNATURES[-fifths - 1];
-        }
+
         stave.addKeySignature(keySpec);
     };
 
@@ -233,21 +223,18 @@ define(function(require, exports, module) {
      */
     AttributesManager.addTimeSignatureToStave = function addTimeSignatureToStave(stave, timeDict) {
         var timeSpec;
-        if(timeDict['@symbol']) {
-            if(timeDict['@symbol'] == 'common') {
+        if (timeDict['@symbol'])
+            if (timeDict['@symbol'] === 'common')
                 timeSpec = 'C';
-            }
-            else if(timeDict['@symbol'] == 'cut') {
+            else if (timeDict['@symbol'] === 'cut')
                 timeSpec = 'C|';
-            }
             else {
                 L.warn('Unsupported time symbol');
                 timeSpec = 'C';
             }
-        }
-        else {
+        else
             timeSpec = timeDict['beats'] + '/' + timeDict['beat-type'];
-        }
+
         stave.addTimeSignature(timeSpec);
     };
 
@@ -256,21 +243,19 @@ define(function(require, exports, module) {
      * @param {Array.<Object>} rawClefs
      */
     AttributesManager.addEndClefToStave = function addEndClefToStave(staves, rawClefs) {
-        for(var i = 0; i < rawClefs.length; i++) {
+        for (var i = 0; i < rawClefs.length; i++) {
             var rawClef = rawClefs[i];
             var clef = AttributesManager.getVexClef(rawClef);
             clef += '_small';
-            if(rawClef['@number'] == 1) {
+            if (rawClef['@number'] === 1)
                 staves[0].addEndClef(clef);
-            }
-            else {
+            else
                 staves[1].addEndClef(clef);
-            }
         }
     };
 
     /**
-     * @param {Array.<Object>} rawClef
+     * @param {Array.<Object>} rawClefs
      * @return {Object} clefNote;
      */
     AttributesManager.getClefNote = function getClefNote(rawClefs) {

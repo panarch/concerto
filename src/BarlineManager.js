@@ -17,21 +17,16 @@ define(function(require, exports, module) {
      * @return {number}
      */
     BarlineManager.getBarlineType = function getBarlineType(barline, isLeft) {
-        if(barline['repeat']) {
-            if(isLeft) {
+        if (barline['repeat'])
+            if (isLeft)
                 return Vex.Flow.Barline.type.REPEAT_BEGIN;
-            }
-            else {
+            else
                 return Vex.Flow.Barline.type.REPEAT_END;
-            }
-        }
 
-        if(barline['bar-style'] == 'light-light') {
+        if (barline['bar-style'] === 'light-light')
             return Vex.Flow.Barline.type.DOUBLE;
-        }
-        else if(barline['bar-style'] == 'light-heavy') {
+        else if (barline['bar-style'] === 'light-heavy')
             return Vex.Flow.Barline.type.END;
-        }
 
         L.warn('Unhandled barline style : ' + barline['bar-style']);
         // default barline
@@ -44,13 +39,13 @@ define(function(require, exports, module) {
      */
     BarlineManager.addBarlineToStave = function addBarlineToStave(stave, barlineDict) {
         var barlineType;
-        if(barlineDict['left-barline']) {
+        if (barlineDict['left-barline']) {
             var leftBarline = barlineDict['left-barline'];
             barlineType = BarlineManager.getBarlineType(leftBarline, true);
             stave.setBegBarType(barlineType);
         }
 
-        if(barlineDict['right-barline']) {
+        if (barlineDict['right-barline']) {
             var rightBarline = barlineDict['right-barline'];
             barlineType = BarlineManager.getBarlineType(rightBarline, false);
             stave.setEndBarType(barlineType);

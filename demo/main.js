@@ -8,10 +8,13 @@
 define(function(require, exports, module) {
     var $ = require('jquery');
     var L = require('js-logger').get('Concerto');
+    L.debug('awiefjaiwejfaiwjefiawjefiwef');
+    alert('awefawef');
     var Converter = require('Converter');
     var Renderer = require('Renderer');
 
     var musicjson;
+    console.log('what the');
 
     /*
     var examples = [
@@ -25,6 +28,7 @@ define(function(require, exports, module) {
     ];
     */
 
+    alert('!!!');
     function load(url) {
         L.debug('load...... ' + url);
         // use xml example instead of using templates.js

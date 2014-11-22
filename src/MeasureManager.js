@@ -19,16 +19,15 @@ define(function(require, exports, module) {
         this.measureIndex = 0;
     }
 
-    /** 
+    /**
      * @this {MeasureManager}
      * @param {number} partIndex
      */
     MeasureManager.prototype.setPartIndex = function setPartIndex(partIndex) {
         this.partIndex = partIndex;
         var measure = this.parts[this.partIndex]['measure'][this.measureIndex];
-        if(measure['print']) {
+        if (measure['print'])
             this.firstMeasures[this.partIndex] = measure;
-        }
     };
 
     /**
@@ -45,9 +44,9 @@ define(function(require, exports, module) {
      * @return {Object}
      */
     MeasureManager.prototype.getFirstMeasure = function getFirstMeasure(partIndex) {
-        if(partIndex === undefined) {
+        if (partIndex === undefined)
             partIndex = this.partIndex;
-        }
+
         return this.firstMeasures[partIndex];
     };
 
@@ -57,10 +56,9 @@ define(function(require, exports, module) {
      */
     MeasureManager.prototype.getLeftMeasure = function getLeftMeasure() {
         var measure = this.parts[this.partIndex]['measure'][this.measureIndex];
-        if(measure['print'] && 
-            (measure['print']['@new-page'] || measure['print']['@new-system'])) {
+        if (measure['print'] &&
+            (measure['print']['@new-page'] || measure['print']['@new-system']))
             return undefined;
-        }
 
         return this.parts[this.partIndex]['measure'][this.measureIndex - 1];
     };
@@ -70,13 +68,12 @@ define(function(require, exports, module) {
      * @return {Object}
      */
     MeasureManager.prototype.getAboveMeasure = function getAboveMeasure() {
-        if(this.partIndex === 0) {
-            var i = this.measureIndex - 1;
+        if (this.partIndex === 0) {
+            //var i = this.measureIndex - 1;
             var firstMeasure = this.getFirstMeasure(this.partIndex);
-            if(firstMeasure['print']['system-layout']['top-system-distance'] !== undefined) { 
-                // firstMeasure['print']['@new-page'] 
+            if (firstMeasure['print']['system-layout']['top-system-distance'] !== undefined) // firstMeasure['print']['@new-page']
                 return undefined;
-            }
+
             // @new-system
             return this.parts[this.parts.length - 1]['measure'][this.measureIndex - 1];
         }

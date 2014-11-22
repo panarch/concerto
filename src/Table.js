@@ -9,11 +9,11 @@ define(function(require, exports, module) {
     var Table = {};
 
     Table.ACCIDENTAL_DICT = {
-        'sharp':'#',
-        'double-sharp':'##',
-        'natural':'n',
-        'flat':'b',
-        'double-flat':'bb'
+              'sharp': '#',
+       'double-sharp': '##',
+            'natural': 'n',
+               'flat': 'b',
+        'double-flat': 'bb'
     };
 
     Table.DEFAULT_CLEF = 'treble';
@@ -35,20 +35,20 @@ define(function(require, exports, module) {
         'w', 'w'];
 
     Table.NOTE_TYPE_DICT = {
-        '1024th'    : '64',
-        '512th'     : '64',
-        '256th'     : '64',
-        '128th'     : '128',
-        '64th'      : '64',
-        '32nd'      : '32',
-        '16th'      : '16',
-        'eighth'    : '8',
-        'quarter'   : 'q',
-        'half'      : 'h',
-        'whole'     : 'w',
-        'breve'     : 'w',
-        'long'      : 'w',
-        'maxima'    : 'w'
+        '1024th': '64',
+         '512th': '64',
+         '256th': '64',
+         '128th': '128',
+          '64th': '64',
+          '32nd': '32',
+          '16th': '16',
+        'eighth': '8',
+       'quarter': 'q',
+          'half': 'h',
+         'whole': 'w',
+         'breve': 'w',
+          'long': 'w',
+        'maxima': 'w'
     };
 
     Table.NOTE_VEX_TYPE_DICT = {
@@ -70,17 +70,17 @@ define(function(require, exports, module) {
     };
 
     Table.CLEF_VEX_TYPE_DICT = {
-        'treble'        : { sign: 'G', line: 2 },
-        'bass'          : { sign: 'F', line: 4 },
-        'alto'          : { sign: 'C', line: 3 },
-        'tenor'         : { sign: 'C', line: 4 },
-        'soprano'       : { sign: 'C', line: 1 },
-        'mezzo-soprano' : { sign: 'C', line: 2 },
-        'baritone-c'    : { sign: 'C', line: 5 },
-        'baritone-f'    : { sign: 'F', line: 3 },
-        'subbass'       : { sign: 'F', line: 5 },
-        'french'        : { sign: 'G', line: 1 },
-        'percussion'    : { sign: 'percussion', line: 2 }
+               'treble': { sign: 'G', line: 2 },
+                 'bass': { sign: 'F', line: 4 },
+                 'alto': { sign: 'C', line: 3 },
+                'tenor': { sign: 'C', line: 4 },
+              'soprano': { sign: 'C', line: 1 },
+        'mezzo-soprano': { sign: 'C', line: 2 },
+           'baritone-c': { sign: 'C', line: 5 },
+           'baritone-f': { sign: 'F', line: 3 },
+              'subbass': { sign: 'F', line: 5 },
+               'french': { sign: 'G', line: 1 },
+           'percussion': { sign: 'percussion', line: 2 }
     };
 
     Table.STAVE_DEFAULT_OPTIONS = {

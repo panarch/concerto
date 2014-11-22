@@ -27,20 +27,15 @@ define(function(require, exports, module) {
      * @return {Object}
      */
     LayoutManager.prototype.getPageMargins = function getPageMargins() {
-        if(Array.isArray(this.pageLayout['page-margins']) === false) {
+        if (Array.isArray(this.pageLayout['page-margins']) === false)
             return this.pageLayout['page-margins'];
-        }
-        else if(this.pageLayout['page-margins'].length == 1) {
-            // both
+        else if (this.pageLayout['page-margins'].length === 1) // both
             return this.pageLayout['page-margins'][0];
-        }
 
-        var pageType = (this.page % 2 == 1) ? 'odd' : 'even';
-        for(var i = 0; i < this.pageLayout['page-margins'].length; i++) {
-            if(this.pageLayout['page-margins'][i]['@type'] == pageType) {
+        var pageType = (this.page % 2 === 1) ? 'odd' : 'even';
+        for (var i = 0; i < this.pageLayout['page-margins'].length; i++)
+            if (this.pageLayout['page-margins'][i]['@type'] === pageType)
                 return this.pageLayout['page-margins'][i];
-            }
-        }
 
         L.error('page-margins required');
         return {};
@@ -48,7 +43,7 @@ define(function(require, exports, module) {
 
     /**
      * @this {LayoutManager}
-     * @param {number} page
+     * @param {number} pageIndex
      */
     LayoutManager.prototype.setPageIndex = function setPageIndex(pageIndex) {
         this.page = pageIndex + 1;
@@ -65,9 +60,10 @@ define(function(require, exports, module) {
     LayoutManager.prototype.getStavePositions = function getStavePositions(measure, leftMeasure, aboveMeasure, firstMeasure) {
         var positions = [];
         var pageMargins = this.getPageMargins();
-        var position, print;
+        var position;
+        var print;
 
-        if(leftMeasure) {
+        if (leftMeasure) {
             measure['y'] = leftMeasure['y'];
             measure['x'] = leftMeasure['x'] + leftMeasure['width'];
             position = {
@@ -79,36 +75,28 @@ define(function(require, exports, module) {
         else {
             print = measure['print'];
             measure['x'] = pageMargins['left-margin'];
-            if(print['system-layout']) {
+            if (print['system-layout']) {
                 var systemLayout = print['system-layout'];
-                if(systemLayout['system-margins'] && 
-                    systemLayout['system-margins']['left-margin']) {
+                if (systemLayout['system-margins'] &&
+                    systemLayout['system-margins']['left-margin'])
                     this.leftMargin = systemLayout['system-margins']['left-margin'];
-                }
-                else {
+                else
                     this.leftMargin = 0;
-                }
 
-                if(systemLayout['top-system-distance'] !== undefined) {
+                if (systemLayout['top-system-distance'] !== undefined) {
                     // new page
                     var topMargin = pageMargins['top-margin'];
                     measure['y'] = topMargin + systemLayout['top-system-distance'];
                 }
-                else if(systemLayout['system-distance'] !== undefined) {
-                    // new system
+                else if (systemLayout['system-distance'] !== undefined) // new system
                     measure['y'] = aboveMeasure['bottom-line-y'] + systemLayout['system-distance'];
-                }
-                else {
+                else
                     L.error('Unhandled layout state');
-                }
             }
-            else if(print['staff-layout'].length > 0) {
-                // new system, staff
+            else if (print['staff-layout'].length > 0) // new system, staff
                 measure['y'] = aboveMeasure['bottom-line-y'] + print['staff-layout'][0]['staff-distance'];
-            }
-            else {
+            else
                 L.error('Lack of print tag');
-            }
 
             measure['x'] += this.leftMargin;
             position = {
@@ -120,18 +108,15 @@ define(function(require, exports, module) {
 
         // check first measure's print
         print = firstMeasure['print'];
-        //if(print['staff-layout'] && print['staff-layout']['@number'] == 2) {
-        if(!print['staff-layout']) {
+        //if (print['staff-layout'] && print['staff-layout']['@number'] == 2) {
+        if (!print['staff-layout'])
             return positions;
-        }
 
         var staffDistance;
-        if(print['staff-layout'].length > 1) {
+        if (print['staff-layout'].length > 1)
             staffDistance = print['staff-layout'][1]['staff-distance'];
-        }
-        else if(print['system-layout'] && print['staff-layout'].length > 0) {
+        else if (print['system-layout'] && print['staff-layout'].length > 0)
             staffDistance = print['staff-layout'][0]['staff-distance'];
-        }
         else {
             L.error('Wrong staff-layout.');
             return positions;
@@ -160,7 +145,7 @@ define(function(require, exports, module) {
         var positions = this.getStavePositions(measure, leftMeasure, aboveMeasure, firstMeasure);
 
         var staves = [];
-        for(var i = 0; i < positions.length; i++) {
+        for (var i = 0; i < positions.length; i++) {
             var position = positions[i];
             var stave = new Vex.Flow.Stave(position['x'], position['y'],
                                 measure['width'], Table.STAVE_DEFAULT_OPTIONS);
