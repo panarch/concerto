@@ -6,15 +6,15 @@
 // Copyright Taehoon Moon 2014
 
 define(function(require, exports, module) {
-    var Table = require('Table');
-    var Converter = require('Converter');
-    var AttributesManager = require('AttributesManager');
-    var MeasureManager = require('MeasureManager');
-    var LayoutManager = require('LayoutManager');
-    var NoteManager = require('NoteManager');
-    var BarlineManager = require('BarlineManager');
-    var Parser = require('Parser');
-    var Renderer = require('Renderer');
+    var Table = require('./Table');
+    var Converter = require('./Converter');
+    var AttributesManager = require('./AttributesManager');
+    var MeasureManager = require('./MeasureManager');
+    var LayoutManager = require('./LayoutManager');
+    var NoteManager = require('./NoteManager');
+    var BarlineManager = require('./BarlineManager');
+    var Parser = require('./Parser');
+    var Renderer = require('./Renderer');
 
     function Concerto() {}
 
@@ -28,5 +28,6 @@ define(function(require, exports, module) {
     Concerto.Parser = Parser;
     Concerto.Renderer = Renderer;
 
+    window.Concerto = Concerto;
     module.exports = Concerto;
 });

@@ -9,12 +9,12 @@ define(function(require, exports, module) {
     var $ = require('jquery');
     var Vex = require('vexflow');
     var L = require('js-logger').get('Parser');
-    var AttributesManager = require('AttributesManager');
-    var LayoutManager = require('LayoutManager');
-    var NoteManager = require('NoteManager');
-    var MeasureManager = require('MeasureManager');
-    var BarlineManager = require('BarlineManager');
-    var Table = require('Table');
+    var AttributesManager = require('./AttributesManager');
+    var LayoutManager = require('./LayoutManager');
+    var NoteManager = require('./NoteManager');
+    var MeasureManager = require('./MeasureManager');
+    var BarlineManager = require('./BarlineManager');
+    var Table = require('./Table');
 
     function Parser() {}
 

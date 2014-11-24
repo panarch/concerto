@@ -8,7 +8,7 @@
 define(function(require, exports, module) {
     var $ = require('jquery');
     var Vex = require('vexflow');
-    var Parser = require('Parser');
+    var Parser = require('./Parser');
 
     /**
      * @constructor

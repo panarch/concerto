@@ -8,7 +8,7 @@
 define(function(require, exports, module) {
     var Vex = require('vexflow');
     var L = require('js-logger').get('NoteManager');
-    var Table = require('Table');
+    var Table = require('./Table');
 
     /**
      * @constructor

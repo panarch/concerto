@@ -1,19 +1,19 @@
 module.exports =  {
   compile: {
     options: {
-      optimize: 'uglify2',
+      optimize: 'none',
       uglify2: {
         mangler: {
           toplevel: false,
-          beautify: false
+          beautify: false 
         }
       },
-      baseUrl: '/src',
-      mainConfigFile: '/src/requireConfig.js',
+      baseUrl: 'src',
+      mainConfigFile: 'src/requireConfig.js',
       name: 'almond',
-      include: 'concerto',
-      insertRequire: ['concerto'],
-      out: '/dist/src/concerto.js',
+      include: 'Concerto',
+      insertRequire: ['Concerto'],
+      out: 'dist/concerto-min.js',
       wrap: true
     }
   }

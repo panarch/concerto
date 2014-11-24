@@ -4,6 +4,13 @@
         <title>Concerto Project</title>
 
         <script type="text/javascript" src="/bower_components/requirejs/require.js" data-main="/src/requireConfig"></script>
+        <script>
+        setTimeout(require.bind(undefined, ['../demo/main']), 500);
+        </script>
+
+        <!--
+        <script src="/dist/concerto-min.js"></script>
+        -->
         <style>
         body {
             margin: 0;

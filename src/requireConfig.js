@@ -24,4 +24,4 @@ require.config({
 
     ]
 });
-require(['../demo/main']);
+require(['Concerto']);
