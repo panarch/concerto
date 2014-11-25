@@ -24,9 +24,9 @@
     "jquery": "~2.1.0",
     "raphael": "~2.1.2",
     "tv4": "~1.0.15",
+    "vexflow": "*",
     "requirejs": "~2.1.15",
     "almond": "~0.3.0",
-    "js-logger": "~0.9.14",
-    "vexflow": "~1.2.23"
+    "js-logger": "~0.9.14"
   }
 }
