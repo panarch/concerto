@@ -18,7 +18,7 @@ require.config({
         jquery: '../bower_components/jquery/dist/jquery',
         'js-logger': '../bower_components/js-logger/src/logger',
         raphael: '../bower_components/raphael/raphael',
-        vexflow: '../bower_components/vexflow/build/vexflow/vexflow-min'
+        vexflow: '../bower_components/vexflow/releases/vexflow-min'
     },
     packages: [
 
