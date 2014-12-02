@@ -6,7 +6,6 @@
     "globals": {
         "DocumentFragment": true,
         "MSGesture": true,
-        "Parse": true,
         "console": true
     },
     "rules": {

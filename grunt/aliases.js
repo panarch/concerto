@@ -3,10 +3,6 @@ module.exports = function (grunt) {
   grunt.registerTask('default', [
     'jscs',
     'eslint',
-    /*
-    'uglify',
-    'concat'
-    */
     'requirejs'
   ]);
 

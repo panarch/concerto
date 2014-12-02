@@ -12,6 +12,7 @@ define(function(require, exports, module) {
     var L = Logger.get('main');
     var Converter = require('Converter');
     var Renderer = require('Renderer');
+    var Player = require('Player');
 
     var musicjson;
 
@@ -44,6 +45,20 @@ define(function(require, exports, module) {
                 var $container = $('#container');
                 var renderer = new Renderer($container, musicjson);
                 renderer.draw();
+
+                var player = new Player(renderer);
+                player.load(function() {
+                    L.debug('loaded');
+                }, '/bower_components/midi-soundfonts/FluidR3_GM/');
+
+                $('#play').on('click', function() {
+                    player.play();
+                });
+
+                $('#stop').on('click', function() {
+                    player.stop();
+                });
+
                 /*
                 var valid = tv4.validate(musicjson, schema);
                 if(valid) { console.log('post-validation success'); }

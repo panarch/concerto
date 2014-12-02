@@ -12,9 +12,14 @@ module.exports =  {
       mainConfigFile: 'src/requireConfig.js',
       name: 'almond',
       include: 'Concerto',
-      insertRequire: ['Concerto'],
+      cjsTranslate: true,
+      //insertRequire: ['Concerto'],
+      wrapShim: true,
       out: 'dist/concerto-min.js',
-      wrap: true
+      wrap: {
+          startFile: 'wraps/start.frag.js',
+          endFile: 'wraps/end.frag.js'
+      }
     }
   }
 };

@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Concerto Project</title>
-
         <script type="text/javascript" src="/bower_components/requirejs/require.js" data-main="/src/requireConfig"></script>
         <script>
         setTimeout(require.bind(undefined, ['../demo/main']), 500);
@@ -28,7 +27,7 @@
         header {
             margin: 0;
             background-color: #555;
-            width: 220px;
+            width: 320px;
             height: 40px;
         }
 
@@ -44,11 +43,13 @@
             <select id="score">
                 <option value="./examples/scales.xml">Scales.xml</option>
                 <option value="./examples/sonata16.xml">Sonata16.xml</option>
-                <option value="./examples/adeste.xml">Adeste.xml</option>
+                <option value="./examples/adeste.xml" selected>Adeste.xml</option>
                 <option value="./examples/inv4.xml">Inv4.xml</option>
                 <option value="./examples/test_notations.xml">Test Notations.xml</option>
                 <option value="./examples/blank_a7.xml">Blank A7.xml</option>
             </select>
+            <button id="play">Play</button>
+            <button id="stop">Stop</button>
         </header>
         <div id="container">
         </div>

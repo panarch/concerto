@@ -15,6 +15,9 @@ define(function(require, exports, module) {
     var BarlineManager = require('./BarlineManager');
     var Parser = require('./Parser');
     var Renderer = require('./Renderer');
+    var Player = require('./Player');
+    var Logger = require('js-logger');
+    Logger.useDefaults();
 
     function Concerto() {}
 
@@ -27,7 +30,9 @@ define(function(require, exports, module) {
     Concerto.BarlineManager = BarlineManager;
     Concerto.Parser = Parser;
     Concerto.Renderer = Renderer;
+    Concerto.Player = Player;
 
     window.Concerto = Concerto;
     module.exports = Concerto;
+    return Concerto;
 });

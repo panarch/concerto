@@ -3,7 +3,7 @@ module.exports = {
     config: '.eslintrc'
   },
   target: [
-    'src/**/**.js',
+    'src/**.js',
     'demo/**.js',
     'schema/musicjson.json'
   ]

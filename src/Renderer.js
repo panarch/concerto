@@ -101,5 +101,9 @@ define(function(require, exports, module) {
         this.draw(page);
     };
 
+    Renderer.prototype.getMusicjson = function getMusicjson() {
+        return this.musicjson;
+    };
+
     module.exports = Renderer;
 });
