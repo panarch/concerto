@@ -1,7 +1,7 @@
 module.exports =  {
   compile: {
     options: {
-      optimize: 'none',
+      optimize: 'uglify2',
       uglify2: {
         mangler: {
           toplevel: false,

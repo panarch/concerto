@@ -6,17 +6,29 @@
 // Copyright Taehoon Moon 2014
 
 define(function(require, exports, module) {
+    /**
+     * @callback callback
+     */
+
     var Midi = require('jsmidgen');
     var MIDI = require('midi');
     var L = require('js-logger').get('Player');
 
     var QUARTER_DURATION = 128;
 
+    /**
+     * @constructor
+     * @template Player
+     */
     function Player(renderer) {
         this.renderer = renderer;
         this.loaded = false;
     }
 
+    /**
+     * @param {Array.<Object>} notes
+     * @return {number}
+     */
     function _getMaxNotesDuration(notes) {
         var max = -Infinity;
         var sum = 0;
@@ -43,6 +55,12 @@ define(function(require, exports, module) {
     }
 
     // private
+
+    /**
+     * @this {Player}
+     * @param {number} measureIndex
+     * @return {number}
+     */
     function _getMaxDuration(measureIndex) {
         var parts = this.renderer.getMusicjson()['part'];
         var maxDuration = -Infinity;
@@ -55,6 +73,10 @@ define(function(require, exports, module) {
         return maxDuration * QUARTER_DURATION;
     }
 
+    /**
+     * @param {Object} note
+     * @return {number}
+     */
     function _convertPitch(note) {
         // C4 is 60, CDEFGAB, octave
         // A0 is 21
@@ -76,6 +98,9 @@ define(function(require, exports, module) {
         return mpitch;
     }
 
+    /**
+     * @this {Player}
+     */
     function _generateMidiFile() {
         var musicjson = this.renderer.getMusicjson();
 
@@ -92,6 +117,10 @@ define(function(require, exports, module) {
         var quarterDuration = parts[0]['measure'][0]['note'][0]['divisions'];
         var measuresLength = parts[0]['measure'].length;
 
+        /**
+         * @param {Array.<Object>} notes
+         * @return {Array.<Array.<Object>>}
+         */
         function splitVoices(notes) {
             var _voices = [];
             var lastIndex = 0;
@@ -108,6 +137,15 @@ define(function(require, exports, module) {
             return _voices;
         }
 
+        /**
+         * @param {number} channel
+         * @param {number} track
+         * @param {number} duration
+         * @param {Array.<Object>} notes
+         * @param {number} i
+         * @param {number} maxDuration
+         * @param {Array.<Object>} chords
+         */
         function run(channel, track, duration, notes, i, maxDuration, chords) {
             var d;
 
@@ -210,6 +248,10 @@ define(function(require, exports, module) {
         L.debug('Finished generating midi file');
     }
 
+    /**
+     * @this {Player}
+     * @param {callback} callback
+     */
     Player.prototype.load = function load(callback, soundfontUrl) {
         if (this.loaded) {
             callback();
@@ -229,6 +271,10 @@ define(function(require, exports, module) {
         }
     };
 
+    /**
+     * @this {Player}
+     * @return {boolean}
+     */
     Player.prototype.play = function play() {
         if (!this.loaded)
             return false;
