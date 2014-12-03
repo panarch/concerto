@@ -140,10 +140,13 @@ define(function(require, exports, module) {
             _voices.push(voice);
         }
 
+        // measure is empty
+        if (!stave)
+            return voices;
+
         var formatter = new Vex.Flow.Formatter();
         var justifyWidth = stave.getNoteEndX() - stave.getNoteStartX() - 10;
         formatter.joinVoices(_voices).format(_voices, justifyWidth, { align_rests: true });
-
         return voices;
     };
 
@@ -295,6 +298,7 @@ define(function(require, exports, module) {
     };
 
     /**
+     * @param {Object} stave
      * @param {Array.<Object>} notes
      * @param {string} clef
      * @param {number} divisions
