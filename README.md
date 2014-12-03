@@ -31,11 +31,6 @@ For performing full builds and tests, you need the following:
     
     $ grunt
 
-Built file does not include dependencies :
-* jQuery
-* Raphael JS
-* Vexflow
-
 ##### Test with:
     $ grunt serve
 And you can connect to http://localhost:8000/demo/
