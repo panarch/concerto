@@ -119,11 +119,9 @@ define(function(require, exports, module) {
      */
     NoteManager.prototype.getVoices = function getVoices(staves) {
         var voices = [];
-        var preStaff = this.staffList[0];
-        var staffVoices = [];
         var stave;
         var time = this.attributesManager.getTimeSignature();
-        var formatter;
+        var _voices = [];
         for (var i = 0; i < this.notesList.length; i++) {
             var staff = this.staffList[i];
             stave = staves[staff - 1];
@@ -137,31 +135,14 @@ define(function(require, exports, module) {
                                             resolution: Vex.Flow.RESOLUTION});
             voice.setMode(Vex.Flow.Voice.Mode.SOFT);
             this.fillVoice(time, notes);
-            voice = voice.addTickables(notes);
+            voice.addTickables(notes);
             voices.push([voice, stave]);
-            if (preStaff !== staff) {
-                _format(staffVoices, stave);
-                staffVoices = [voice];
-                preStaff = staff;
-            }
-            else
-                staffVoices.push(voice);
+            _voices.push(voice);
         }
 
-        if (staffVoices.length > 0)
-            _format(staffVoices, stave);
-
-        function _format(staffVoices, stave) {
-            var options = {};
-            if (staffVoices.length > 1)
-                options.align_rests = true;
-            else
-                options.align_rests = false;
-
-            formatter = new Vex.Flow.Formatter();
-            formatter.joinVoices(staffVoices);
-            formatter.formatToStave(staffVoices, stave, options);
-        }
+        var formatter = new Vex.Flow.Formatter();
+        var justifyWidth = stave.getNoteEndX() - stave.getNoteStartX() - 10;
+        formatter.joinVoices(_voices).format(_voices, justifyWidth, { align_rests: true });
 
         return voices;
     };
@@ -318,7 +299,7 @@ define(function(require, exports, module) {
      * @param {string} clef
      * @param {number} divisions
      */
-    NoteManager.getStaveNote = function getStaveNote(notes, clef, divisions) {
+    NoteManager.getStaveNote = function getStaveNote(stave, notes, clef, divisions) {
         var keys = [];
         var accidentals = [];
         var baseNote = notes[0];
@@ -356,6 +337,7 @@ define(function(require, exports, module) {
                 duration += 'd';
 
         var staveNote = new Vex.Flow.StaveNote({ keys: keys, duration: duration, clef: clef });
+        staveNote.setStave(stave);
 
         for (i = 0; i < accidentals.length; i++)
             if (accidentals[i])

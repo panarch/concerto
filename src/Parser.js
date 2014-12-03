@@ -90,15 +90,10 @@ define(function(require, exports, module) {
 
         var _voices = [];
         var stave = voices[0][1];
-        //var justifyWidth = stave.getNoteEndX() - stave.getNoteStartX() - 10;
-
         var i;
 
         for (i = 0; i < voices.length; i++)
             _voices.push(voices[i][0]);
-
-        //var formatter = new Vex.Flow.Formatter();
-        //formatter.joinVoices(_voices).format(_voices, justifyWidth, { align_rests: false });
 
         for (i = 0; i < voices.length; i++) {
             var voice = voices[i][0];
@@ -251,14 +246,12 @@ define(function(require, exports, module) {
 
                         clef = attributesManager.getClef(p, note['staff'], Table.DEFAULT_CLEF);
                         var staveNote;
-                        if (note['staff'] && note['staff'] === 2) {
-                            staveNote = NoteManager.getStaveNote(chordNotes, clef, divisions);
-                            noteManager.addStaveNote(staveNote, note);
-                        }
-                        else {
-                            staveNote = NoteManager.getStaveNote(chordNotes, clef, divisions);
-                            noteManager.addStaveNote(staveNote, note);
-                        }
+                        if (note['staff'] && note['staff'] === 2)
+                            staveNote = NoteManager.getStaveNote(stave2, chordNotes, clef, divisions);
+                        else
+                            staveNote = NoteManager.getStaveNote(stave, chordNotes, clef, divisions);
+
+                        noteManager.addStaveNote(staveNote, note);
 
                         note['staveNote'] = staveNote;
                     }
@@ -293,7 +286,6 @@ define(function(require, exports, module) {
             if (ctx === undefined)
                 continue;
 
-            // does vexflow not support multiple part formatting?
             Parser.drawVoices(voices, ctx);
 
             for (j = 0; j < beams.length; j++)
