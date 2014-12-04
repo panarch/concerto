@@ -105,5 +105,9 @@ define(function(require, exports, module) {
         return this.musicjson;
     };
 
+    Renderer.prototype.getContext = function getContext(page) {
+        return this.pages[page];
+    };
+
     module.exports = Renderer;
 });

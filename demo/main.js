@@ -51,6 +51,8 @@ define(function(require, exports, module) {
                     L.debug('loaded');
                 }, '/bower_components/midi-soundfonts/FluidR3_GM/');
 
+                $('#play').off('click');
+                $('#stop').off('click');
                 $('#play').on('click', function() {
                     player.play();
                 });
