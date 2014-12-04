@@ -9,6 +9,7 @@ define(function(require, exports, module) {
     var Vex = require('vexflow');
     var L = require('js-logger').get('NoteManager');
     var Table = require('./Table');
+    var NoteTool = require('./NoteTool');
 
     /**
      * @constructor
@@ -65,7 +66,7 @@ define(function(require, exports, module) {
         this.notes = [];
         if (this.duration > 0) {
             // if back appears, it means change of voice.
-            var noteType = NoteManager.getStaveNoteTypeFromDuration(this.duration, divisions);
+            var noteType = NoteTool.getStaveNoteTypeFromDuration(this.duration, divisions);
             var ghostNote = new Vex.Flow.GhostNote({ duration: noteType });
             this.notes.push(ghostNote);
         }
@@ -80,7 +81,7 @@ define(function(require, exports, module) {
     NoteManager.prototype.addForward = function addForward(duration) {
         var divisions = this.attributesManager.getDivisions();
         this.duration += duration;
-        var noteType = NoteManager.getStaveNoteTypeFromDuration(duration, divisions);
+        var noteType = NoteTool.getStaveNoteTypeFromDuration(duration, divisions);
         var ghostNote = new Vex.Flow.GhostNote({ duration: noteType });
         this.notes.push(ghostNote);
     };
@@ -97,7 +98,7 @@ define(function(require, exports, module) {
         var duration = 0;
         for (var i = 0; i < notes.length; i++) {
             var staveNote = notes[i];
-            duration += NoteManager.getDurationFromStaveNote(staveNote, divisions);
+            duration += NoteTool.getDurationFromStaveNote(staveNote, divisions);
         }
 
         duration = maxDuration - duration;
@@ -108,7 +109,7 @@ define(function(require, exports, module) {
         else if (duration === 0)
             return;
 
-        var noteType = NoteManager.getStaveNoteTypeFromDuration(duration, divisions);
+        var noteType = NoteTool.getStaveNoteTypeFromDuration(duration, divisions);
         var ghostNote = new Vex.Flow.GhostNote({ duration: noteType });
         notes.push(ghostNote);
     };
@@ -151,70 +152,6 @@ define(function(require, exports, module) {
     };
 
     // static functions
-
-    /**
-     * @param {Object} staveNote
-     * @param {number} divisions
-     * @return {number}
-     */
-    NoteManager.getDurationFromStaveNote = function getDurationFromStaveNote(staveNote, divisions) {
-        var noteType = staveNote.getDuration();
-        var numDots;
-        if (staveNote['-concerto-num-dots'])
-            numDots = staveNote['-concerto-num-dots'];
-        else
-            numDots = 0;
-
-        var index = Table.NOTE_VEX_TYPES.indexOf(noteType);
-        var offset = index - Table.NOTE_VEX_QUARTER_INDEX;
-        var duration = Math.pow(2, offset) * divisions;
-        duration = duration * 2 - duration * Math.pow(2, -numDots);
-
-        return duration;
-    };
-
-    /**
-     * @param {number} duration
-     * @param {number} divisions
-     * @param {boolean=} withDots
-     */
-    NoteManager.getStaveNoteTypeFromDuration = function getStaveNoteTypeFromDuration(duration, divisions, withDots) {
-        if (withDots === undefined)
-            withDots = false;
-
-        var i = Table.NOTE_VEX_QUARTER_INDEX;
-        var count;
-        var num;
-        for (count = 0; count < 20; count++) {
-            num = Math.floor(duration / divisions);
-            if (num === 1)
-                break;
-            else if (num > 1) {
-                divisions *= 2;
-                i++;
-            }
-            else {
-                divisions /= 2;
-                i--;
-            }
-        }
-        if (count === 20)
-            L.error('No proper StaveNote type');
-
-        var noteType = Table.NOTE_VEX_TYPES[i];
-        if (withDots)
-            for (count = 0; count < 5; count++) {
-                duration -= Math.floor(duration / divisions);
-                divisions /= 2;
-                num = Math.floor(duration / divisions);
-                if (num === 1)
-                    noteType += 'd';
-                else
-                    break;
-            }
-
-        return noteType;
-    };
 
     /**
      * @param {Object} staveNote
@@ -313,9 +250,12 @@ define(function(require, exports, module) {
         if (baseNote['type'] !== undefined)
             duration = Table.NOTE_TYPE_DICT[baseNote['type']];
         else
-            duration = NoteManager.getStaveNoteTypeFromDuration(baseNote['duration'], divisions);
+            duration = NoteTool.getStaveNoteTypeFromDuration(baseNote['duration'], divisions);
 
         if (notes.length === 1 && baseNote['rest']) {
+            if (baseNote['hidden'])
+                return new Vex.Flow.GhostNote({ duration: duration });
+
             duration += 'r';
             keys.push(Table.DEFAULT_REST_PITCH);
             clef = undefined;

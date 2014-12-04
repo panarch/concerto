@@ -8,6 +8,7 @@
 define(function(require, exports, module) {
     var L = require('js-logger').get('Converter');
     var $ = require('jquery');
+    var NoteTool = require('NoteTool');
 
     function Converter() {}
 
@@ -314,12 +315,45 @@ define(function(require, exports, module) {
         return note;
     };
 
-    Converter.getForwardAndBackupTag = function getForwardAndBackupTag($elem) {
-        var elem = {
-            'tag': $elem.prop('tagName'),
-            'duration': parseInt($elem.find('duration').text())
-        };
+    Converter.getForwardTag = function getForwardTag($elem, divisions) {
+        if (!divisions)
+            L.error('divisions undefined');
+
+        // use NoteManager's static function --> Make it as NoteTool...?
+        var duration = parseInt($elem.find('duration').text());
+        var elem = NoteTool.getNoteTypeFromDuration(duration, divisions);
+        elem['tag'] = 'note';
+        elem['duration'] = duration;
+        elem['rest'] = true;
+        elem['hidden'] = true;
+
         return elem;
+    };
+
+    Converter.getBackupTag = function getBackupTag($elem, divisions, duration) {
+        // divide into backup and forward if necessary
+        var backupDuration = parseInt($elem.find('duration').text());
+        var notes = [];
+
+        var elem = {
+            'tag': 'backup',
+            'duration': duration
+        };
+
+        notes.push(elem);
+
+        if (backupDuration < duration) {
+            var d = duration - backupDuration;
+            var forward = NoteTool.getNoteTypeFromDuration(d, divisions);
+            forward['tag'] = 'note';
+            forward['duration'] = d;
+            forward['rest'] = true;
+            forward['hidden'] = true;
+
+            notes.push(forward);
+        }
+
+        return notes;
     };
 
     Converter.getBarlineTag = function getBarlineTag($barline) {
@@ -348,6 +382,7 @@ define(function(require, exports, module) {
         var parts = [];
         var $parts = $xml.find('part');
 
+        var divisions;
         $parts.each(function() {
             var part = {
                 '@id': $(this).attr('id'),
@@ -362,17 +397,38 @@ define(function(require, exports, module) {
                     'barline': {}
                 };
 
+                var duration = 0;
                 $(this).children().each(function() {
+                    var note;
                     // print, note, attributes, backward, forward, barline
                     var tagName = $(this).prop('tagName');
                     if (tagName === 'print')
                         measure['print'] = Converter.getPrintTag($(this));
-                    else if (tagName === 'attributes')
+                    else if (tagName === 'attributes') {
+                        var attributes = Converter.getAttributesTag($(this));
+                        if (attributes['divisions'])
+                            divisions = attributes['divisions'];
+
                         measure['note'].push(Converter.getAttributesTag($(this)));
-                    else if (tagName === 'note')
+                    }
+                    else if (tagName === 'note') {
+                        note = Converter.getNoteTag($(this));
+                        if (!note['chord'])
+                            duration += note['duration'];
+
                         measure['note'].push(Converter.getNoteTag($(this)));
-                    else if (tagName === 'backup' || tagName === 'forward')
-                        measure['note'].push(Converter.getForwardAndBackupTag($(this)));
+                    }
+                    else if (tagName === 'backup') {
+                        var notes = Converter.getBackupTag($(this), divisions, duration);
+                        // reset duration
+                        duration = 0;
+                        measure['note'] = measure['note'].concat(notes);
+                    }
+                    else if (tagName === 'forward') {
+                        note = Converter.getForwardTag($(this), divisions);
+                        duration += note['duration'];
+                        measure['note'].push(note);
+                    }
                     else if (tagName === 'barline') {
                         // should decide whether left or right barline.
                         var barline = Converter.getBarlineTag($(this));

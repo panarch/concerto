@@ -25,6 +25,7 @@ define(function(require, exports, module) {
     Table.FLAT_MAJOR_KEY_SIGNATURES = ['F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb'];
     Table.SHARP_MAJOR_KEY_SIGNATURES = ['G', 'D', 'A', 'E', 'B', 'F#', 'C#'];
 
+    Table.NOTE_QUARTER_INDEX = 8;
     Table.NOTE_TYPES = ['1024th', '512th', '256th', '128th',
         '64th', '32nd', '16th', 'eighth', 'quarter', 'half', 'whole', 'breve',
         'long', 'maxima'];
