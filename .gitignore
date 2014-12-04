@@ -2,3 +2,4 @@ node_modules
 bower_components
 .codio
 *.swp
+*.DS_Store
