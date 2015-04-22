@@ -43,7 +43,7 @@ define(function(require, exports, module) {
                 */
 
                 var $container = $('#container');
-                var renderer = new Renderer($container, musicjson);
+                var renderer = new Renderer(musicjson, { $container: $container });
                 renderer.draw();
 
                 var player = new Player(renderer);

@@ -438,7 +438,7 @@ define(function(require, exports, module) {
                             measure['barline']['right-barline'] = barline;
                     }
                     else
-                        L.error('Unsupported note tagname : ' + tagName);
+                        L.warn('Unsupported note tagname : ' + tagName);
                 });
 
                 part['measure'].push(measure);

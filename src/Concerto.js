@@ -8,6 +8,8 @@
 define(function(require, exports, module) {
     var Table = require('./Table');
     var Converter = require('./Converter');
+    var LayoutTool = require('./LayoutTool');
+    var NoteTool = require('./NoteTool');
     var AttributesManager = require('./AttributesManager');
     var MeasureManager = require('./MeasureManager');
     var LayoutManager = require('./LayoutManager');
@@ -23,6 +25,8 @@ define(function(require, exports, module) {
 
     Concerto.Table = Table;
     Concerto.Converter = Converter;
+    Concerto.LayoutTool = LayoutTool;
+    Concerto.NoteTool = NoteTool;
     Concerto.AttributesManager = AttributesManager;
     Concerto.MeasureManager = MeasureManager;
     Concerto.LayoutManager = LayoutManager;

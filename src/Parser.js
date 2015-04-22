@@ -6,7 +6,6 @@
 // Copyright Taehoon Moon 2014
 
 define(function(require, exports, module) {
-    var $ = require('jquery');
     var Vex = require('vexflow');
     var L = require('js-logger').get('Parser');
     var AttributesManager = require('./AttributesManager');
@@ -21,37 +20,6 @@ define(function(require, exports, module) {
     /*
      musicjson --> vexflow
     */
-
-    /**
-     * @param {Object} musicjson
-     * @return {integer}
-     */
-    Parser.getNumPages = function getNumPages(musicjson) {
-        var measures = musicjson['part'][0]['measure'];
-        var num = 1;
-        for (var i = 0; i < measures.length; i++) {
-            var measure = measures[i];
-            if (measure['print'] && measure['print']['@new-page'])
-                num++;
-        }
-
-        return num;
-    };
-
-    /**
-     * @param {Object} musicjson
-     * @return {Object.<string, number>}
-     */
-    Parser.getPageSize = function getPageSize(musicjson) {
-        var pageLayout = musicjson['defaults']['page-layout'];
-        $('#content').css('width', pageLayout['page-width'])
-                     .css('height', pageLayout['page-height']);
-        $('#content').find('svg').remove();
-        return {
-            width: pageLayout['page-width'],
-            height: pageLayout['page-height']
-        };
-    };
 
     /**
      * @param {Array} notes

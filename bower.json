@@ -6,7 +6,7 @@
     "Taehoon Moon <panarch@kaist.ac.kr>"
   ],
   "description": "A Javascript library for rendering MusicXML using MusicJSON and Vexflow",
-  "main": "src/concerto.js",
+  "main": "dist/concerto-min.js",
   "keywords": [
     "musicxml",
     "vexflow",
