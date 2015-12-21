@@ -13,27 +13,12 @@
   "bugs": {
     "url": "https://github.com/panarch/concerto/issues"
   },
-  "devDependencies": {
-    "grunt": "~0.4.3",
-    "grunt-contrib-nodeunit": "~0.2.0",
-    "grunt-contrib-uglify": "~0.4.0",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-connect": "~0.9.0",
-    "grunt-contrib-watch": "~0.6.1",
-    "grunt-contrib-requirejs": "~0.4.4",
-    "load-grunt-config": "~0.16.0",
-    "time-grunt": "~1.0.0",
-    "bower": "~1.3.12",
-    "grunt-bower-requirejs": "~1.1.0",
-    "grunt-eslint": "~2.0.0",
-    "grunt-jscs": "~0.8.1"
-  },
-  "description": "A Javascript library for rendering MusicXML using MusicJSON and Vexflow. Copyright (c) 2014 Taehoon Moon",
+  "devDependencies": {},
+  "description": "A Javascript library for rendering MusicXML using MusicJSON and Vexflow. Copyright (c) 2015 Taehoon Moon",
   "main": "build/concerto-min.js",
   "dependencies": {},
   "keywords": [
     "musicxml",
-    "musicjson",
     "vexflow",
     "music",
     "notation"

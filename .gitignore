@@ -1,5 +1,6 @@
 node_modules
 bower_components
+deprecated
 .codio
 *.swp
 *.DS_Store
