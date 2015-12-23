@@ -2,6 +2,7 @@
   "name": "concerto",
   "version": "0.1.0",
   "scripts": {
+    "server": "webpack-dev-server --colors --progress",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -9,11 +10,18 @@
     "url": "https://github.com/panarch/concerto.git"
   },
   "author": "Taehoon Moon",
-  "license": "MIT-LICENSE",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/panarch/concerto/issues"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.3.21",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.3.13",
+    "jquery": "^2.1.4",
+    "webpack": "^1.12.9",
+    "webpack-dev-server": "^1.14.0"
+  },
   "description": "A Javascript library for rendering MusicXML using MusicJSON and Vexflow. Copyright (c) 2015 Taehoon Moon",
   "main": "build/concerto-min.js",
   "dependencies": {},

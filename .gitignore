@@ -4,3 +4,4 @@ deprecated
 .codio
 *.swp
 *.DS_Store
+bundle.js
