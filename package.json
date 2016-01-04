@@ -2,7 +2,7 @@
   "name": "concerto",
   "version": "0.1.0",
   "scripts": {
-    "server": "webpack-dev-server --colors --progress",
+    "start": "webpack-dev-server --colors --progress",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,6 +19,7 @@
     "babel-loader": "^6.2.0",
     "babel-preset-es2015": "^6.3.13",
     "jquery": "^2.1.4",
+    "vexflow": "^1.2.36",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   },

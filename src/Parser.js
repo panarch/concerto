@@ -14,8 +14,8 @@ const parseMovement = scorePartwise => {
   const titleNode = scorePartwise.querySelector('movement-title');
   const numberNode = scorePartwise.querySelector('movement-number');
 
-  const title = titleNode ? titleElem.textContent : null;
-  const number = numberNode ? numberElem.textContent : null;
+  const title = titleNode ? titleNode.textContent : null;
+  const number = numberNode ? numberNode.textContent : null;
 
   return new Movement({
     title: title,
@@ -104,9 +104,48 @@ const parsePartList = partListNode => {
     };
   });
 
+  const partGroups = [];
+  const partGroupMap = new Map();
+  let pi = 0;
+
+  [...partListNode.children].forEach(node => {
+    if (node.tagName === 'part-group') {
+      const type = node.getAttribute('type');
+      const number = Number(node.getAttribute('number'));
+      if (type === 'stop') {
+        const partGroup = partGroupMap.get(number);
+        partGroup.stopPartIndex = pi - 1;
+        partGroups.push(partGroup);
+        return;
+      }
+
+      const groupSymbolNode = node.querySelector('group-symbol');
+      const groupNameNode = node.querySelector('group-name');
+      const groupBarlineNode = node.querySelector('group-barline');
+      const partGroup = {
+        number: number,
+        startPartIndex: pi,
+      };
+
+      if (groupSymbolNode)
+        partGroup.groupSymbol = groupSymbolNode.textContent;
+
+      if (groupNameNode)
+        partGroup.groupName = groupNameNode.textContent;
+
+      if (groupBarlineNode)
+        partGroup.groupBarline = groupBarlineNode.textContent === 'yes';
+
+      partGroupMap.set(number, partGroup);
+    } else if (node.tagName === 'score-part') {
+      pi++;
+    }
+  });
+
   return new PartList({
     id: partListNode.getAttribute('id'),
-    scoreParts: scoreParts,
+    scoreParts,
+    partGroups,
   });
 };
 

@@ -43,7 +43,7 @@ export const parsePageLayout = layoutNode => {
     pageMarginsMap: new Map(),
   };
 
-  [...layoutNode.querySelector('page-margins')].forEach(node => {
+  [...layoutNode.querySelectorAll('page-margins')].forEach(node => {
     const type = node.hasAttribute('type') ? node.getAttribute('type') : 'both';
 
     pageLayout.pageMarginsMap.set(type, {

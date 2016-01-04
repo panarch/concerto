@@ -18,4 +18,13 @@ export default class Score {
   getDefaults() { return this.defaults; }
   getPartList() { return this.partList; }
   getParts() { return this.parts; }
+
+  getNumPages() {
+    let num = 1;
+    this.parts[0].getMeasures().forEach(measure => {
+      if (measure.hasNewPage()) num++;
+    });
+
+    return num;
+  }
 }

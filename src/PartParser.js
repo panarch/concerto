@@ -11,9 +11,9 @@ const parsePrint = (data, printNode) => {
   const systemLayoutNode = printNode.querySelector('system-layout');
   const staffLayoutNodes = [...printNode.querySelectorAll('staff-layout')];
 
-  if (printNode.hasAttribute('new-page'))
+  if (printNode.getAttribute('new-page') === 'yes')
     print.newPage = true;
-  else if (printNode.hasAttribute('new-system'))
+  else if (printNode.getAttribute('new-system') === 'yes')
     print.newSystem = true;
 
   if (measureNumberingNode)
@@ -76,6 +76,21 @@ const parseAttributes = (data, attrNode, noteBegin) => {
         }
 
         break;
+      case 'staff-details':
+        const staffSizeNode = node.querySelector('staff-size');
+        const staffDetails = {};
+
+        if (node.hasAttribute('print-object'))
+          staffDetails.printObject = node.getAttribute('print-object') === 'yes';
+
+        staffDetails.number = node.hasAttribute('number') ?
+          Number(node.getAttribute('number')) : 1;
+
+        if (staffSizeNode)
+          staffDetails.staffSize = Number(staffSizeNode.textContent);
+
+        data.staffDetailsMap.set(staffDetails.number, staffDetails);
+        break;
     }
   });
 };
@@ -106,6 +121,7 @@ const parseNote = (data, noteNode, noteState) => {
   const voice = voiceNode ? Number(voiceNode.textContent) : 1;
   const { onGrace, onChord } = noteState;
   const isNewVoice = data.voices.indexOf(voice) === -1;
+  const isNewStaff = data.staffs.indexOf(staff) === -1;
   const isRest = noteNode.querySelector('rest') ? true : false;
   const isChord = noteNode.querySelector('chord') ? true : false;
   const isGrace = noteNode.querySelector('grace') ? true : false;
@@ -117,6 +133,9 @@ const parseNote = (data, noteNode, noteState) => {
     data.voices.push(voice);
     data.notesMap.set(voice, []);
   }
+
+  if (isNewStaff)
+    data.staffs.push(staff);
 
   const notes = data.notesMap.get(voice);
   const notesDuration = sumNotesDuration(notes);
@@ -227,8 +246,11 @@ export const parsePart = partNode => {
   const measures = [...partNode.querySelectorAll('measure')].map(node => {
     const data = {
       number: Number(node.getAttribute('number')),
+      width: node.hasAttribute('width') ? Number(node.getAttribute('width')) : 100,
       notesMap: new Map(), // key is voice number
       voices: [],
+      staffs: [],
+      staffDetailsMap: new Map(), // key is staff number
     };
 
     if (node.hasAttribute('width'))
