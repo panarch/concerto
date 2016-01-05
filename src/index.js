@@ -16,7 +16,7 @@ import Renderer from './Renderer';
 */
 
 $.ajax({
-  url: './examples/sonata16.xml',
+  url: './examples/ActorPreludeSample.xml',
   dataType: 'text',
   success: data => {
     const domParser = new DOMParser();

@@ -32,11 +32,12 @@ export default class Formatter {
     for (let pi = 0; pi < this.state.numParts; pi++) {
       this.state.topSystemDistanceMap.set(pi, topSystemDistance);
       this.state.systemDistanceMap.set(pi, systemDistance);
-      this.state.staffDistanceMap.set(pi, staffDistance);
 
       const numStaffs = this.parts[pi].getNumStaffs();
       for (let staff = 1; staff <= numStaffs; staff++) {
-        this.state.staffDisplayedMap.set(`${pi}/${staff}`, true);
+        const key = `${pi}/${staff}`;
+        this.state.staffDistanceMap.set(key, staffDistance);
+        this.state.staffDisplayedMap.set(key, true);
       }
     }
   }
@@ -74,8 +75,11 @@ export default class Formatter {
       if (measure.hasSystemDistance())
         this.state.systemDistanceMap.set(pi, measure.getSystemDistance());
 
-      if (measure.hasStaffDistances())
-        this.state.staffDistanceMap.set(pi, measure.getStaffDistance());
+      if (measure.hasStaffDistances()) {
+        [...measure.getStaffLayoutMap().keys()].forEach(staff => {
+          this.state.staffDistanceMap.set(`${pi}/${staff}`, measure.getStaffDistance(staff));
+        });
+      }
 
     });
   }
@@ -99,8 +103,7 @@ export default class Formatter {
       const topSystemDistance = this.state.topSystemDistanceMap.get(pi);
       const pageTopMargin = this.defaults.getPageTopMargin(this.state.pageNumber);
       const systemDistance = this.state.systemDistanceMap.get(pi);
-      const staffDistance = this.state.staffDistanceMap.get(pi);
-      const height = measure.getHeight(numStaffs, staffDistance);
+      const staffDistance = this.state.staffDistanceMap.get(`${pi}/1`);
       const displayed = getDisplayed(pi, numStaffs);
 
       if (displayed === false) {
@@ -109,9 +112,14 @@ export default class Formatter {
         return;
       }
 
+      let height = Measure.STAFF_HEIGHT;
+      for (let staff = 2; staff <= numStaffs; staff++) {
+        height += Measure.STAFF_HEIGHT + this.state.staffDistanceMap.get(`${pi}/${staff}`);
+      }
+
       const measureTopY = pi === 0 && (measure.hasNewPage() || mi === 0) ?
         topSystemDistance + pageTopMargin :
-        aboveBottomY + measure.getStaffDistance(0, staffDistance);
+        aboveBottomY + (pi === 0 ? systemDistance : staffDistance);
       const measureBottomY = measureTopY + height;
 
       aboveBottomY = measureBottomY;
@@ -164,16 +172,15 @@ export default class Formatter {
         }
 
         const measureTopY = measureTopYs[pi];
-        const staffDistance = this.state.staffDistanceMap.has(pi) ?
-          this.state.staffDistanceMap.get(pi) : 0;
-
         for (let staff = 1; staff <= numStaffs; staff++) {
+          const key = `${pi}/${staff}`;
+          const staffDistance = this.state.staffDistanceMap.has(key) ?
+            this.state.staffDistanceMap.get(key) : 0;
+
           measure.setStaffY(staff,
             measureTopY + (Measure.STAFF_HEIGHT + staffDistance) * (staff - 1)
           );
-          measure.setStaffDisplayed(staff,
-            this.state.staffDisplayedMap.get(`${pi}/${staff}`)
-          );
+          measure.setStaffDisplayed(staff, this.state.staffDisplayedMap.get(`${pi}/${staff}`));
         }
 
         measure.setY(measureTopY);

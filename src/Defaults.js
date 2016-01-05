@@ -2,16 +2,16 @@
 // @author Taehoon Moon
 
 export default class Defaults {
-  constructor({ scaling, pageLayout, systemLayout, staffLayouts }) {
+  constructor({ scaling, pageLayout, systemLayout, staffLayoutMap }) {
     this.scaling = scaling;
     this.pageLayout = pageLayout;
     this.systemLayout = systemLayout;
-    this.staffLayouts = staffLayouts;
+    this.staffLayoutMap = staffLayoutMap;
   }
 
   getPageLayout() { return this.pageLayout; }
   getSystemLayout() { return this.systemLayout; }
-  getStaffLayout() { return this.staffLayout; }
+  getStaffLayoutMap() { return this.staffLayoutMap; }
 
   getPageSize() {
     return {
@@ -71,13 +71,13 @@ export default class Defaults {
   getSystemDistance() {
     return this.systemLayout && this.systemLayout.systemDistance !== undefined ?
       this.systemLayout.systemDistance :
-      this.SYSTEM_DISTANCE;
+      Defaults.SYSTEM_DISTANCE;
   }
 
-  getStaffDistance(index = 0) {
-    return this.staffLayouts && this.staffLayouts[index] !== undefined ?
-      this.staffLayouts[index].staffDistance :
-      this.STAFF_DISTANCE;
+  getStaffDistance(staff = 1) {
+    return this.staffLayoutMap && this.staffLayoutMap.has(staff) ?
+      this.staffLayoutMap.get(staff).staffDistance :
+      Defaults.STAFF_DISTANCE;
   }
 }
 

@@ -48,8 +48,8 @@ export default class Measure {
   }
 
   hasStaffDistances() {
-    const staffLayouts = this.getStaffLayouts();
-    return staffLayouts && staffLayouts.length > 0;
+    const staffLayoutMap = this.getStaffLayoutMap();
+    return staffLayoutMap && staffLayoutMap.size > 0;
   }
 
   isNewLineStarting() {
@@ -82,7 +82,13 @@ export default class Measure {
       staffDistance * (Math.max(_numStaffs - 1, 0));
   }
 
-  getNumStaffs() { return this.staffs.length; }
+  getNumStaffs() {
+    const staffLayoutMap = this.getStaffLayoutMap();
+    return Math.max(
+      this.staffs.length,
+      staffLayoutMap ? staffLayoutMap.size : 1
+    );
+  }
 
   getSystemLayout() {
     return this.print && this.print.systemLayout ?
@@ -90,9 +96,9 @@ export default class Measure {
       undefined;
   }
 
-  getStaffLayouts() {
-    return this.print && this.print.staffLayouts ?
-      this.print.staffLayouts :
+  getStaffLayoutMap() {
+    return this.print && this.print.staffLayoutMap ?
+      this.print.staffLayoutMap :
       undefined;
   }
 
@@ -122,10 +128,9 @@ export default class Measure {
       defaultValue;
   }
 
-  getStaffDistance(index = 0, defaultValue = Measure.STAFF_DISTANCE) {
-    // TODO
+  getStaffDistance(staff = 1, defaultValue = Measure.STAFF_DISTANCE) {
     return this.hasStaffDistances() ?
-      this.getStaffLayouts()[0].staffDistance :
+      this.getStaffLayoutMap().get(staff).staffDistance :
       defaultValue;
   }
 

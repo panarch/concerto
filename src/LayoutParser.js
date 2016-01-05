@@ -24,16 +24,17 @@ export const parseSystemLayout = node => {
 };
 
 export const parseStaffLayout = nodes => {
-  const staffLayouts = [];
+  const staffLayoutMap = new Map();
 
   nodes.forEach(node => {
-    staffLayouts.push({
-      number: node.hasAttribute('number') ? Number(node.getAttribute('number')) : 1,
+    const staff = node.hasAttribute('number') ? Number(node.getAttribute('number')) : 1;
+    staffLayoutMap.set(staff, {
+      number: staff,
       staffDistance: Number(node.querySelector('staff-distance').textContent),
     });
   });
 
-  return staffLayouts;
+  return staffLayoutMap;
 };
 
 export const parsePageLayout = layoutNode => {

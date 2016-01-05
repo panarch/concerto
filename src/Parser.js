@@ -67,7 +67,7 @@ const parseDefaults = defaultsNode => {
     data.pageLayout = parsePageLayout(pageLayoutNode);
 
   if (staffLayoutNodes)
-    data.staffLayouts = parseStaffLayout(staffLayoutNodes);
+    data.staffLayoutMap = parseStaffLayout(staffLayoutNodes);
 
   if (systemLayoutNode)
     data.systemLayout = parseSystemLayout(systemLayoutNode);

@@ -23,7 +23,7 @@ const parsePrint = (data, printNode) => {
     print.systemLayout = parseSystemLayout(systemLayoutNode);
 
   if (staffLayoutNodes.length > 0)
-    print.staffLayouts = parseStaffLayout(staffLayoutNodes);
+    print.staffLayoutMap = parseStaffLayout(staffLayoutNodes);
 
   data.print = print;
 };
