@@ -1,34 +1,41 @@
 {
-    "env": {
-        "browser": true,
-        "amd": true
-    },
-    "globals": {
-        "DocumentFragment": true,
-        "MSGesture": true,
-        "console": true
-    },
-    "rules": {
-        "dot-notation": 0,
-        "valid-jsdoc": 0,
-        "camelcase": 0,
-        "curly": 0,
-        "brace-style": [1, "stroustrup"],
-        "consistent-this": 2,
-        "no-constant-condition": 1,
-        "no-underscore-dangle": 0,
-        "no-use-before-define": 0,
-        "func-names": 0,
-        "func-style": [2, "declaration"],
-        "new-cap": 0,
-        "new-parens": 2,
-        "no-ternary": 0,
-        "no-unused-vars": [1, {"vars": "local", "args": "none"}],
-        "quotes": [2, "single"],
-        "one-var": 0,
-        "space-infix-ops": 0,
-        "strict": 0,
-        "no-alert": 0,
-        "no-console": 0
-    }
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "strict": 0,
+    // Possible Errors
+    "comma-dangle": [1, "always-multiline"],
+    "valid-jsdoc": 0, //Moved to a separate script check-jsdoc
+    // Best Practices
+    "block-scoped-var": 1,
+    "curly": [0, "multi"],
+    "dot-location": [0, "object"], //Too much noise for now, might consider to enable it as a warning later
+    "eqeqeq": [2, "allow-null"],
+    "no-loop-func": 0,
+    "no-multi-spaces": 0,
+    "no-self-compare": 1,
+    // Variables
+    "no-shadow": 0, //Too much noise from tests, might consider to enable it as a warning later
+    "no-undefined": 0,
+    "no-unused-vars": [2, {"vars": "all", "args": "none"}],
+    "no-use-before-define": [0, "nofunc"],
+    "no-new": 0,
+    // Stylistic Issues
+    "brace-style": [1, "1tbs", { "allowSingleLine": true }],
+    "camelcase": 0, //Too much noise from tests, might consider to enable it as a warning later
+    "comma-spacing": [0, {"before": false, "after": true}], //Noise
+    "consistent-this": [0, "_this"],
+    "key-spacing": 0,
+    "new-cap": 0,
+    "no-trailing-spaces": 0,
+    "no-mixed-spaces-and-tabs": 0, //Too much noise for now, might consider to enable it as a warning later
+    "no-underscore-dangle": 0,
+    "quotes": [0, "single"], //Too much noise for now, might consider to enable it as a warning later
+    "semi-spacing": 0, //Too much noise for now, might consider to enable it as a warning later
+    "space-infix-ops": 0,
+    "space-unary-ops": 0 //Too much noise for now, might consider to enable it as a warning later
+  }
 }
