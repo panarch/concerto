@@ -21,7 +21,7 @@ export default class Formatter {
       pageNumber: 1,
       topSystemDistanceMap: new Map(),
       systemDistanceMap: new Map(),
-      staffDistanceMap: new Map(),
+      staffDistanceMap: new Map(), // ${pi}/{staff}
       staffDisplayedMap: new Map(), // ${pi}/{staff}
     };
 
@@ -188,11 +188,7 @@ export default class Formatter {
     }
   }
 
-  format() {
-    this.resetState();
-    this.formatX();
-    this.formatY();
-
+  createStaves() {
     this.parts.forEach(part => {
       const numStaffs = part.getNumStaffs();
       const measures = part.getMeasures();
@@ -202,21 +198,62 @@ export default class Formatter {
         if (measure.isNewLineStarting())
           printMeasure = measure;
 
-        const staves = [];
-        const staveOptions = {
+        const x = measure.getX();
+        const width = measure.getWidth();
+        const options = {
           space_above_staff_ln: 0,
         };
 
         for (let staff = 1; staff <= numStaffs; staff++) {
-          const x = measure.getX();
           const y = measure.getStaffY(staff);
 
-          if (printMeasure.isStaffDisplayed(staff))
-            staves.push(new Vex.Flow.Stave(x, y, measure.getWidth(), staveOptions));
+          if (printMeasure.isStaffDisplayed(staff)) {
+            const stave = new Vex.Flow.Stave(x, y, width, options);
+            measure.setStave(staff, stave);
+          }
         }
-
-        measure.setStaves(staves);
       });
     });
+  }
+
+  formatAttributes() {
+    this.parts.forEach((part, pi) => {
+      const numStaffs = part.getNumStaffs();
+      const measures = part.getMeasures();
+      let prevMeasure;
+      let time;
+
+      measures.forEach((measure, mi) => {
+        let timeUpdated = false;
+
+        if (measure.getTime()) {
+          time = measure.getTime();
+          timeUpdated = true;
+        }
+
+        if (mi === 0 || measure.isNewLineStarting() || timeUpdated) {
+          measure.getStaves().forEach(stave => {
+            stave.addTimeSignature(`${time.beats}/${time.beatType}`);
+          });
+        }
+
+        if (measure.isNewLineStarting() && timeUpdated) {
+          prevMeasure.getStaves().forEach(stave => {
+            stave.setEndBarType(Vex.Flow.Barline.type.NONE);
+            stave.addEndTimeSignature(`${time.beats}/${time.beatType}`);
+          });
+        }
+
+        prevMeasure = measure;
+      });
+    });
+  }
+
+  format() {
+    this.resetState();
+    this.formatX();
+    this.formatY();
+    this.createStaves();
+    this.formatAttributes();
   }
 }

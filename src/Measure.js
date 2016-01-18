@@ -20,7 +20,7 @@ export default class Measure {
     // variables
     this.x = null;
     this.y = null;
-    this.staves = null;
+    this.staveMap = new Map();
     this.staffYMap = new Map();
     this.staffDisplayedMap = new Map();
   }
@@ -155,8 +155,10 @@ export default class Measure {
   getStaffY(staff = 1) { return this.staffYMap.get(staff); }
   setStaffY(staff, y) { this.staffYMap.set(staff, y); }
 
-  getStaves() { return this.staves; }
-  setStaves(staves) { this.staves = staves; }
+  getStaves() { return [...this.staveMap.values()]; }
+  setStave(staff, stave) { this.staveMap.set(staff, stave); }
+
+  getTime() { return this.time }
 }
 
 Measure.STAFF_HEIGHT = 40;
