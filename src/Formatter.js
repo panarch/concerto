@@ -218,7 +218,7 @@ export default class Formatter {
 
   formatAttributes() {
     this.parts.forEach((part, pi) => {
-      const numStaffs = part.getNumStaffs();
+      //const numStaffs = part.getNumStaffs();
       const measures = part.getMeasures();
       let prevMeasure;
       let time;

@@ -8,7 +8,6 @@ import Movement from './Movement';
 import Identification from './Identification';
 import Defaults from './Defaults';
 import PartList from './PartList';
-import Measure from './Measure';
 
 const parseMovement = scorePartwise => {
   const titleNode = scorePartwise.querySelector('movement-title');
@@ -60,7 +59,7 @@ const parseDefaults = defaultsNode => {
     scaling: {
       millimeters: Number(scalingNode.querySelector('millimeters').textContent),
       tenths: Number(scalingNode.querySelector('tenths').textContent),
-    }
+    },
   };
 
   if (pageLayoutNode)

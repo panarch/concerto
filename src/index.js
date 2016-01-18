@@ -36,5 +36,5 @@ $.ajax({
     console.log('renderer created');
     renderer.render();
     console.log('draw complete');
-  }
+  },
 });

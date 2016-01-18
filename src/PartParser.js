@@ -100,16 +100,14 @@ const sumNotesDuration = notes => {
     const prevDuration = prev.duration ? prev.duration : 0;
     const nextDuration = next.duration ? next.duration : 0;
 
-    return {
-      duration: prevDuration + nextDuration
-    };
+    return { duration: prevDuration + nextDuration };
   }, 0);
 };
 
 const parseNote = (data, noteNode, noteState) => {
   const staffNode = noteNode.querySelector('staff');
   const voiceNode = noteNode.querySelector('voice');
-  const graceNode = noteNode.querySelector('grace');
+  //const graceNode = noteNode.querySelector('grace');
   const pitchNode = noteNode.querySelector('pitch');
   const typeNode = noteNode.querySelector('type');
   const stemNode = noteNode.querySelector('stem');
@@ -119,7 +117,7 @@ const parseNote = (data, noteNode, noteState) => {
   const numDots = noteNode.querySelectorAll('dot').length;
   const staff = staffNode ? Number(staffNode.textContent) : 1;
   const voice = voiceNode ? Number(voiceNode.textContent) : 1;
-  const { onGrace, onChord } = noteState;
+  //const { onGrace, onChord } = noteState;
   const isNewVoice = data.voices.indexOf(voice) === -1;
   const isNewStaff = data.staffs.indexOf(staff) === -1;
   const isRest = noteNode.querySelector('rest') ? true : false;
