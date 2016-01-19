@@ -233,7 +233,7 @@ export default class Formatter {
 
         if (mi === 0 || measure.isNewLineStarting() || timeUpdated) {
           measure.getStaves().forEach(stave => {
-            stave.addTimeSignature(`${time.beats}/${time.beatType}`);
+            if (time) stave.addTimeSignature(`${time.beats}/${time.beatType}`);
           });
         }
 
