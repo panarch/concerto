@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "scripts": {
     "start": "webpack-dev-server --colors --progress",
-    "lint": "eslint src/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack --entry ./src/index.js --output-filename ./build/concerto.js --output-library Concerto --output-library-target umd",
+    "test:lint": "eslint src/",
+    "test:diff": "node ./tools/generate_svg_images.js && ./tools/visual_regression.sh",
+    "test": "npm run test:lint && npm run test:diff"
   },
   "repository": {
     "type": "git",
@@ -26,8 +28,8 @@
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   },
-  "description": "A Javascript library for rendering MusicXML using MusicJSON and Vexflow. Copyright (c) 2015 Taehoon Moon",
-  "main": "build/concerto-min.js",
+  "description": "A Javascript library for parsing and rendering MusicXML. Copyright (c) 2016 Taehoon Moon",
+  "main": "build/concerto.js",
   "dependencies": {},
   "keywords": [
     "musicxml",
