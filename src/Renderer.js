@@ -8,31 +8,30 @@ export default class Renderer {
     this.score = score;
     this.element = element;
     this.numPages = score.getNumPages();
-    this.renderers = [];
+    this.contexts = [];
   }
+
+  getContexts() { return this.contexts; }
 
   setupRenderers() {
     const pageSize = this.score.getDefaults().getPageSize();
 
-    this.renderers = [];
+    this.contexts = [];
     for (let i = 0; i < this.numPages; i++) {
-      const renderer = new Vex.Flow.Renderer(this.element, Vex.Flow.Renderer.Backends.SVG);
-      const svg = renderer.getContext().svg;
-      svg.style.width = `${pageSize.width}px`;
-      svg.style.height = `${pageSize.height}px`;
-      this.renderers.push(renderer);
+      const context = Vex.Flow.Renderer.getSVGContext(this.element, pageSize.width, pageSize.height);
+      this.contexts.push(context);
     }
   }
 
   renderStaves() {
     this.score.getParts().forEach((part, pi) => {
       let index = 0;
-      let context = this.renderers[index].getContext();
+      let context = this.contexts[index];
 
       part.getMeasures().forEach((measure, mi) =>{
         if (measure.hasNewPage()) {
           index++;
-          context = this.renderers[index].getContext();
+          context = this.contexts[index];
         }
 
         measure.getStaves().forEach(stave => {
@@ -67,14 +66,14 @@ export default class Renderer {
     };
 
     let index = 0;
-    let context = this.renderers[index].getContext();
+    let context = this.contexts[index];
 
     for (let mi = 0; mi < numMeasures; mi++) {
       const firstPartMeasure = parts[0].getMeasures()[mi];
       const isNewLineStarting = mi === 0 || firstPartMeasure.isNewLineStarting();
       if (firstPartMeasure.hasNewPage()) {
         index++;
-        context = this.renderers[index].getContext();
+        context = this.contexts[index];
       }
 
       if (isNewLineStarting) {
