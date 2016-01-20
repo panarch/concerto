@@ -7,9 +7,9 @@ import Measure from './Measure';
 
 const parsePrint = (data, printNode) => {
   const print = {};
-  const measureNumberingNode = printNode.querySelector('measure-numbering');
-  const systemLayoutNode = printNode.querySelector('system-layout');
-  const staffLayoutNodes = [...printNode.querySelectorAll('staff-layout')];
+  const measureNumberingNode = printNode.getElementsByTagName('measure-numbering')[0];
+  const systemLayoutNode = printNode.getElementsByTagName('system-layout')[0];
+  const staffLayoutNodes = [...printNode.getElementsByTagName('staff-layout')];
 
   if (printNode.getAttribute('new-page') === 'yes')
     print.newPage = true;
@@ -34,15 +34,15 @@ const parseBarline = (data, barlineNote, noteBegin) => {
 };
 
 const parseAttributes = (data, attrNode, noteBegin) => {
-  [...attrNode.children].forEach(node => {
+  [...attrNode.childNodes].forEach(node => {
     switch (node.tagName) {
       case 'divisions':
         data.divisions = Number(node.textContent);
         break;
       case 'time':
         data.time = {
-          beats: Number(node.querySelector('beats').textContent),
-          beatType: Number(node.querySelector('beat-type').textContent),
+          beats: Number(node.getElementsByTagName('beats')[0].textContent),
+          beatType: Number(node.getElementsByTagName('beat-type')[0].textContent),
         };
 
         if (node.hasAttribute('symbol'))
@@ -51,15 +51,15 @@ const parseAttributes = (data, attrNode, noteBegin) => {
         break;
       case 'key':
         data.key = {
-          fifths: Number(node.querySelector('fifths').textContent),
-          mode: node.querySelector('mode').textContent,
+          fifths: Number(node.getElementsByTagName('fifths')[0].textContent),
+          mode: node.getElementsByTagName('mode')[0].textContent,
         };
         break;
       case 'clef':
-        const lineNode = node.querySelector('line');
-        const clefOctaveChangeNode = node.querySelector('clef-octave-change');
+        const lineNode = node.getElementsByTagName('line')[0];
+        const clefOctaveChangeNode = node.getElementsByTagName('clef-octave-change')[0];
         const clef = {
-          sign: node.querySelector('sign').textContent,
+          sign: node.getElementsByTagName('sign')[0].textContent,
         };
 
         if (lineNode)
@@ -77,7 +77,7 @@ const parseAttributes = (data, attrNode, noteBegin) => {
 
         break;
       case 'staff-details':
-        const staffSizeNode = node.querySelector('staff-size');
+        const staffSizeNode = node.getElementsByTagName('staff-size')[0];
         const staffDetails = {};
 
         if (node.hasAttribute('print-object'))
@@ -105,24 +105,24 @@ const sumNotesDuration = notes => {
 };
 
 const parseNote = (data, noteNode, noteState) => {
-  const staffNode = noteNode.querySelector('staff');
-  const voiceNode = noteNode.querySelector('voice');
+  const staffNode = noteNode.getElementsByTagName('staff')[0];
+  const voiceNode = noteNode.getElementsByTagName('voice')[0];
   //const graceNode = noteNode.querySelector('grace');
-  const pitchNode = noteNode.querySelector('pitch');
-  const typeNode = noteNode.querySelector('type');
-  const stemNode = noteNode.querySelector('stem');
-  const durationNode = noteNode.querySelector('duration');
-  const accidentalNode = noteNode.querySelector('accidental');
-  const beamNodes = [...noteNode.querySelectorAll('beam')];
-  const numDots = noteNode.querySelectorAll('dot').length;
+  const pitchNode = noteNode.getElementsByTagName('pitch')[0];
+  const typeNode = noteNode.getElementsByTagName('type')[0];
+  const stemNode = noteNode.getElementsByTagName('stem')[0];
+  const durationNode = noteNode.getElementsByTagName('duration')[0];
+  const accidentalNode = noteNode.getElementsByTagName('accidental')[0];
+  const beamNodes = [...noteNode.getElementsByTagName('beam')];
+  const numDots = noteNode.getElementsByTagName('dot').length;
   const staff = staffNode ? Number(staffNode.textContent) : 1;
   const voice = voiceNode ? Number(voiceNode.textContent) : 1;
   //const { onGrace, onChord } = noteState;
   const isNewVoice = data.voices.indexOf(voice) === -1;
   const isNewStaff = data.staffs.indexOf(staff) === -1;
-  const isRest = noteNode.querySelector('rest') ? true : false;
-  const isChord = noteNode.querySelector('chord') ? true : false;
-  const isGrace = noteNode.querySelector('grace') ? true : false;
+  const isRest = noteNode.getElementsByTagName('rest')[0] ? true : false;
+  const isChord = noteNode.getElementsByTagName('chord')[0] ? true : false;
+  const isGrace = noteNode.getElementsByTagName('grace')[0] ? true : false;
 
   noteState.onGrace = isGrace;
   noteState.onChord = isChord;
@@ -164,11 +164,11 @@ const parseNote = (data, noteNode, noteState) => {
 
   if (pitchNode) {
     const pitch = {
-      step: pitchNode.querySelector('step').textContent,
-      octave: Number(pitchNode.querySelector('octave').textContent),
+      step: pitchNode.getElementsByTagName('step')[0].textContent,
+      octave: Number(pitchNode.getElementsByTagName('octave')[0].textContent),
     };
 
-    const alterNode = pitchNode.querySelector('alter');
+    const alterNode = pitchNode.getElementsByTagName('alter')[0];
     if (alterNode)
       pitch.alter = Number(alterNode.textContent);
 
@@ -227,10 +227,10 @@ const parseNotes = (data, noteNodes) => {
         parseNote(data, node, noteState);
         break;
       case 'forward':
-        noteState.duration += Number(node.querySelector('duration').textContent);
+        noteState.duration += Number(node.getElementsByTagName('duration')[0].textContent);
         break;
       case 'backup':
-        noteState.duration -= Number(node.querySelector('duration').textContent);
+        noteState.duration -= Number(node.getElementsByTagName('duration')[0].textContent);
         break;
       case 'direction':
         // TODO
@@ -241,7 +241,7 @@ const parseNotes = (data, noteNodes) => {
 
 export const parsePart = partNode => {
   const id = partNode.getAttribute('id');
-  const measures = [...partNode.querySelectorAll('measure')].map(node => {
+  const measures = [...partNode.getElementsByTagName('measure')].map(node => {
     const data = {
       number: Number(node.getAttribute('number')),
       width: node.hasAttribute('width') ? Number(node.getAttribute('width')) : 100,
@@ -254,7 +254,7 @@ export const parsePart = partNode => {
     if (node.hasAttribute('width'))
       data.width = Number(node.getAttribute('width'));
 
-    parseNotes(data, [...node.children]);
+    parseNotes(data, [...node.childNodes]);
     return new Measure(data);
   });
 

@@ -10,8 +10,8 @@ import Defaults from './Defaults';
 import PartList from './PartList';
 
 const parseMovement = scorePartwise => {
-  const titleNode = scorePartwise.querySelector('movement-title');
-  const numberNode = scorePartwise.querySelector('movement-number');
+  const titleNode = scorePartwise.getElementsByTagName('movement-title')[0];
+  const numberNode = scorePartwise.getElementsByTagName('movement-number')[0];
 
   const title = titleNode ? titleNode.textContent : null;
   const number = numberNode ? numberNode.textContent : null;
@@ -23,14 +23,14 @@ const parseMovement = scorePartwise => {
 };
 
 const parseIdentification = idNode => {
-  const encodingNode = idNode.querySelector('encoding');
-  const rightsNode = idNode.querySelector('rights');
-  const encodingDateNode = encodingNode.querySelector('encoding-date');
+  const encodingNode = idNode.getElementsByTagName('encoding')[0];
+  const rightsNode = idNode.getElementsByTagName('rights')[0];
+  const encodingDateNode = encodingNode.getElementsByTagName('encoding-date')[0];
 
   const rights = rightsNode ? rightsNode.textContent : null;
   const encodingDate = encodingDateNode ? encodingDateNode.textContent : null;
-  const softwareList = [...encodingNode.querySelectorAll('software')].map(node => node.textContent);
-  const creatorList = [...idNode.querySelectorAll('creator')].map(node => {
+  const softwareList = [...encodingNode.getElementsByTagName('software')].map(node => node.textContent);
+  const creatorList = [...idNode.getElementsByTagName('creator')].map(node => {
     return {
       type: node.getAttribute('type'),
       content: node.textContent,
@@ -50,15 +50,15 @@ const parseIdentification = idNode => {
 };
 
 const parseDefaults = defaultsNode => {
-  const scalingNode = defaultsNode.querySelector('scaling');
-  const pageLayoutNode = defaultsNode.querySelector('page-layout');
-  const systemLayoutNode = defaultsNode.querySelector('system-layout');
-  const staffLayoutNodes = [...defaultsNode.querySelectorAll('staff-layout')];
+  const scalingNode = defaultsNode.getElementsByTagName('scaling')[0];
+  const pageLayoutNode = defaultsNode.getElementsByTagName('page-layout')[0];
+  const systemLayoutNode = defaultsNode.getElementsByTagName('system-layout')[0];
+  const staffLayoutNodes = [...defaultsNode.getElementsByTagName('staff-layout')];
 
   const data = {
     scaling: {
-      millimeters: Number(scalingNode.querySelector('millimeters').textContent),
-      tenths: Number(scalingNode.querySelector('tenths').textContent),
+      millimeters: Number(scalingNode.getElementsByTagName('millimeters')[0].textContent),
+      tenths: Number(scalingNode.getElementsByTagName('tenths')[0].textContent),
     },
   };
 
@@ -75,16 +75,16 @@ const parseDefaults = defaultsNode => {
 };
 
 const parsePartList = partListNode => {
-  const scoreParts = [...partListNode.querySelectorAll('score-part')].map(node => {
-    const scoreInstNode = node.querySelector('score-instrument');
-    const midiInstNode = node.querySelector('midi-instrument');
-    const volumeNode = midiInstNode.querySelector('volume');
-    const panNode = midiInstNode.querySelector('pan');
+  const scoreParts = [...partListNode.getElementsByTagName('score-part')].map(node => {
+    const scoreInstNode = node.getElementsByTagName('score-instrument')[0];
+    const midiInstNode = node.getElementsByTagName('midi-instrument')[0];
+    const volumeNode = midiInstNode.getElementsByTagName('volume')[0];
+    const panNode = midiInstNode.getElementsByTagName('pan')[0];
 
     const midiInstrument = {
       id: midiInstNode.getAttribute('id'),
-      midiChannel: Number(midiInstNode.querySelector('midi-channel').textContent),
-      midiProgram: Number(midiInstNode.querySelector('midi-program').textContent),
+      midiChannel: Number(midiInstNode.getElementsByTagName('midi-channel')[0].textContent),
+      midiProgram: Number(midiInstNode.getElementsByTagName('midi-program')[0].textContent),
     };
 
     if (volumeNode)
@@ -94,10 +94,10 @@ const parsePartList = partListNode => {
       midiInstrument.pan = Number(panNode.textContent);
 
     return {
-      partName: node.querySelector('part-name').textContent,
+      partName: node.getElementsByTagName('part-name')[0].textContent,
       scoreInstrument: {
         id: scoreInstNode.getAttribute('id'),
-        instrumentName: scoreInstNode.querySelector('instrument-name').textContent,
+        instrumentName: scoreInstNode.getElementsByTagName('instrument-name')[0].textContent,
       },
       midiInstrument: midiInstrument,
     };
@@ -107,7 +107,7 @@ const parsePartList = partListNode => {
   const partGroupMap = new Map();
   let pi = 0;
 
-  [...partListNode.children].forEach(node => {
+  [...partListNode.childNodes].forEach(node => {
     if (node.tagName === 'part-group') {
       const type = node.getAttribute('type');
       const number = Number(node.getAttribute('number'));
@@ -118,9 +118,9 @@ const parsePartList = partListNode => {
         return;
       }
 
-      const groupSymbolNode = node.querySelector('group-symbol');
-      const groupNameNode = node.querySelector('group-name');
-      const groupBarlineNode = node.querySelector('group-barline');
+      const groupSymbolNode = node.getElementsByTagName('group-symbol')[0];
+      const groupNameNode = node.getElementsByTagName('group-name')[0];
+      const groupBarlineNode = node.getElementsByTagName('group-barline')[0];
       const partGroup = {
         number: number,
         startPartIndex: pi,
@@ -153,13 +153,15 @@ const parseParts = partNodes => {
 };
 
 export const parse = (doc) => {
-  const scorePartwise = doc.querySelector('score-partwise');
+  const scorePartwise = doc.getElementsByTagName('score-partwise')[0];
   const version = scorePartwise.getAttribute('version');
   const movement = parseMovement(scorePartwise);
-  const identification = parseIdentification(scorePartwise.querySelector('identification'));
-  const defaults = parseDefaults(scorePartwise.querySelector('defaults'));
-  const partList = parsePartList(scorePartwise.querySelector('part-list'));
-  const parts = parseParts([...scorePartwise.querySelectorAll('part')]);
+  const identification = parseIdentification(
+    scorePartwise.getElementsByTagName('identification')[0]
+  );
+  const defaults = parseDefaults(scorePartwise.getElementsByTagName('defaults')[0]);
+  const partList = parsePartList(scorePartwise.getElementsByTagName('part-list')[0]);
+  const parts = parseParts([...scorePartwise.getElementsByTagName('part')]);
 
   return new Score({
     version: version,
