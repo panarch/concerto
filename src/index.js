@@ -11,7 +11,8 @@ import { parse } from './Parser';
 import Formatter from './Formatter';
 import Renderer from './Renderer';
 
-export default {
+// use module.exports for node.js compatibility
+module.exports = {
   Score,
   Defaults,
   Movement,
