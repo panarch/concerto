@@ -33,7 +33,7 @@ const parseBarline = (data, barlineNote, noteBegin) => {
   data[`${noteBegin ? 'right' : 'left'}Barline`] = barline;
 };
 
-const parseAttributes = (data, attrNode, noteBegin) => {
+const parseAttributes = (data, attrNode, state) => {
   [...attrNode.childNodes].forEach(node => {
     switch (node.tagName) {
       case 'divisions':
@@ -56,6 +56,8 @@ const parseAttributes = (data, attrNode, noteBegin) => {
         };
         break;
       case 'clef':
+        const staff = node.hasAttribute('number') ?
+          Number(node.getAttribute('number')) : state.staff;
         const lineNode = node.getElementsByTagName('line')[0];
         const clefOctaveChangeNode = node.getElementsByTagName('clef-octave-change')[0];
         const clef = {
@@ -68,11 +70,11 @@ const parseAttributes = (data, attrNode, noteBegin) => {
         if (clefOctaveChangeNode)
           clef.clefOctaveChange = Number(clefOctaveChangeNode.textContent);
 
-        if (!noteBegin)
-          data.clef = clef;
-        else {
+        if (!state.noteBegin) {
+          data.clefMap.set(staff, clef);
+        } else {
           clef.tag = 'clef';
-          data.notesMap.get(data.voices[0]).push(clef);
+          data.notesMap.get(state.voice).push(clef);
         }
 
         break;
@@ -104,7 +106,7 @@ const sumNotesDuration = notes => {
   }, 0);
 };
 
-const parseNote = (data, noteNode, noteState) => {
+const parseNote = (data, noteNode, state) => {
   const staffNode = noteNode.getElementsByTagName('staff')[0];
   const voiceNode = noteNode.getElementsByTagName('voice')[0];
   //const graceNode = noteNode.querySelector('grace');
@@ -124,27 +126,30 @@ const parseNote = (data, noteNode, noteState) => {
   const isChord = noteNode.getElementsByTagName('chord')[0] ? true : false;
   const isGrace = noteNode.getElementsByTagName('grace')[0] ? true : false;
 
-  noteState.onGrace = isGrace;
-  noteState.onChord = isChord;
+  state.onGrace = isGrace;
+  state.onChord = isChord;
+  if (state.staff !== staff) state.staff = staff;
+  if (state.voice !== voice) state.voice = voice;
 
   if (isNewVoice) {
     data.voices.push(voice);
     data.notesMap.set(voice, []);
   }
 
-  if (isNewStaff)
+  if (isNewStaff) {
     data.staffs.push(staff);
+  }
 
   const notes = data.notesMap.get(voice);
   const notesDuration = sumNotesDuration(notes);
 
-  if (noteState.duration > notesDuration) {
+  if (state.duration > notesDuration) {
     notes.push({
       tag: 'note',
-      duration: noteState.duration - notesDuration,
+      duration: state.duration - notesDuration,
       hidden: true,
     });
-  } else if (noteState.duration < notesDuration) {
+  } else if (state.duration < notesDuration) {
     console.error('notesState.duration > notesDuration');
   }
 
@@ -183,7 +188,7 @@ const parseNote = (data, noteNode, noteState) => {
   if (durationNode) {
     const duration = Number(durationNode.textContent);
     note.duration = duration;
-    noteState.duration += duration;
+    state.duration += duration;
   }
 
   if (typeNode) note.type = typeNode.textContent;
@@ -204,11 +209,13 @@ const parseNote = (data, noteNode, noteState) => {
 };
 
 const parseNotes = (data, noteNodes) => {
-  let noteBegin = false;
-  const noteState = {
+  const state = {
     onGrace: false,
     onChord: false,
     duration: 0,
+    staff: 1,
+    voice: 1,
+    noteBegin: false,
   };
 
   noteNodes.forEach(node => {
@@ -217,20 +224,20 @@ const parseNotes = (data, noteNodes) => {
         parsePrint(data, node);
         break;
       case 'barline':
-        parseBarline(data, node, noteBegin);
+        parseBarline(data, node, state.noteBegin);
         break;
       case 'attributes':
-        parseAttributes(data, node, noteBegin);
+        parseAttributes(data, node, state);
         break;
       case 'note':
-        noteBegin = true;
-        parseNote(data, node, noteState);
+        state.noteBegin = true;
+        parseNote(data, node, state);
         break;
       case 'forward':
-        noteState.duration += Number(node.getElementsByTagName('duration')[0].textContent);
+        state.duration += Number(node.getElementsByTagName('duration')[0].textContent);
         break;
       case 'backup':
-        noteState.duration -= Number(node.getElementsByTagName('duration')[0].textContent);
+        state.duration -= Number(node.getElementsByTagName('duration')[0].textContent);
         break;
       case 'direction':
         // TODO
@@ -246,6 +253,7 @@ export const parsePart = partNode => {
       number: Number(node.getAttribute('number')),
       width: node.hasAttribute('width') ? Number(node.getAttribute('width')) : 100,
       notesMap: new Map(), // key is voice number
+      clefMap: new Map(), // key is staff number
       voices: [],
       staffs: [],
       staffDetailsMap: new Map(), // key is staff number

@@ -2,7 +2,7 @@
 // @author Taehoon Moon
 
 export default class Measure {
-  constructor({ number, width, voices, staffs, notesMap, time, clef, print, divisions,
+  constructor({ number, width, voices, staffs, notesMap, time, clefMap, print, divisions,
       leftBarline, rightBarline, staffDetailsMap }) {
     this.number = number;
     this.width = width;
@@ -10,7 +10,7 @@ export default class Measure {
     this.staffs = staffs;
     this.notesMap = notesMap;
     this.time = time;
-    this.clef = clef;
+    this.clefMap = clefMap;
     this.print = print;
     this.divisions = divisions;
     this.leftBarline = leftBarline;
@@ -156,9 +156,18 @@ export default class Measure {
   setStaffY(staff, y) { this.staffYMap.set(staff, y); }
 
   getStaves() { return [...this.staveMap.values()]; }
+  getStaveMap() { return this.staveMap; }
+  getStave(staff = 1) { return this.staveMap.get(staff); }
   setStave(staff, stave) { this.staveMap.set(staff, stave); }
 
   getTime() { return this.time }
+  getClefMap() { return this.clefMap; }
+  getClef(staff = 1) {
+    const clef = this.clefMap.get(staff);
+    return clef ? clef : this.clefMap.get(1);
+  }
+
+  getNotesMap() { return this.notesMap; }
 }
 
 Measure.STAFF_HEIGHT = 40;
