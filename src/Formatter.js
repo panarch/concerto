@@ -3,6 +3,7 @@
 
 import Vex from 'vexflow';
 import Measure from './Measure';
+import { getVFClef } from './Util';
 
 export default class Formatter {
   constructor(score) {
@@ -216,7 +217,52 @@ export default class Formatter {
     });
   }
 
-  formatAttributes() {
+  formatClef() {
+    this.parts.forEach((part, pi) => {
+      const clefMap = new Map(); // {staff}
+      let prevMeasure;
+
+      part.getMeasures().forEach((measure, mi) => {
+        const clefUpdated = new Map(); // {staff}
+
+        measure.getClefMap().forEach((clef, staff) => {
+          clefMap.set(staff, clef);
+          clefUpdated.set(staff, clef);
+        });
+
+        if (mi === 0 || measure.isNewLineStarting()) {
+          measure.getStaveMap().forEach((stave, staff) => {
+            const vfClef = getVFClef(clefMap.get(staff));
+            if (vfClef) stave.addClef(vfClef);
+          });
+        }
+
+        clefUpdated.forEach((clef, staff) => {
+          if (!prevMeasure) return;
+
+          const vfClef = getVFClef(clef);
+          const stave = prevMeasure.getStave(staff);
+          if (stave) stave.addEndClef(vfClef, 'small');
+        });
+
+        measure.getNotesMap().forEach(notes => {
+          let staff = 1;
+          notes.forEach(note => {
+            if (note.staff && note.staff !== staff) staff = note.staff;
+            if (note.tag === 'clef') clefMap.set(staff, note);
+          });
+        });
+
+        prevMeasure = measure;
+      });
+    });
+  }
+
+  formatKeySignature() {
+
+  }
+
+  formatTimeSignature() {
     this.parts.forEach((part, pi) => {
       //const numStaffs = part.getNumStaffs();
       const measures = part.getMeasures();
@@ -254,6 +300,8 @@ export default class Formatter {
     this.formatX();
     this.formatY();
     this.createStaves();
-    this.formatAttributes();
+    this.formatClef();
+    this.formatTimeSignature();
+    this.formatKeySignature();
   }
 }
