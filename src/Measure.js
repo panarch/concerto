@@ -2,13 +2,14 @@
 // @author Taehoon Moon
 
 export default class Measure {
-  constructor({ number, width, voices, staffs, notesMap, time, clefMap, print, divisions,
+  constructor({ number, width, voices, staffs, notesMap, key, time, clefMap, print, divisions,
       leftBarline, rightBarline, staffDetailsMap }) {
     this.number = number;
     this.width = width;
     this.voices = voices;
     this.staffs = staffs;
     this.notesMap = notesMap;
+    this.key = key;
     this.time = time;
     this.clefMap = clefMap;
     this.print = print;
@@ -160,7 +161,8 @@ export default class Measure {
   getStave(staff = 1) { return this.staveMap.get(staff); }
   setStave(staff, stave) { this.staveMap.set(staff, stave); }
 
-  getTime() { return this.time }
+  getKey() { return this.key; }
+  getTime() { return this.time; }
   getClefMap() { return this.clefMap; }
   getClef(staff = 1) {
     const clef = this.clefMap.get(staff);

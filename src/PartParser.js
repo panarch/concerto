@@ -50,10 +50,15 @@ const parseAttributes = (data, attrNode, state) => {
 
         break;
       case 'key':
+        const cancelNode = node.getElementsByTagName('cancel')[0];
+        const modeNode = node.getElementsByTagName('mode')[0];
         data.key = {
           fifths: Number(node.getElementsByTagName('fifths')[0].textContent),
-          mode: node.getElementsByTagName('mode')[0].textContent,
         };
+
+        if (cancelNode) data.key.cancel = Number(cancelNode.textContent);
+        if (modeNode) data.key.mode = modeNode.textContent;
+
         break;
       case 'clef':
         const staff = node.hasAttribute('number') ?
@@ -92,6 +97,9 @@ const parseAttributes = (data, attrNode, state) => {
           staffDetails.staffSize = Number(staffSizeNode.textContent);
 
         data.staffDetailsMap.set(staffDetails.number, staffDetails);
+        break;
+      case 'transpose':
+        // TODO
         break;
     }
   });

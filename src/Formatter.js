@@ -3,7 +3,7 @@
 
 import Vex from 'vexflow';
 import Measure from './Measure';
-import { getVFClef } from './Util';
+import { getVFClef, getVFKeySignature } from './Util';
 
 export default class Formatter {
   constructor(score) {
@@ -259,17 +259,45 @@ export default class Formatter {
   }
 
   formatKeySignature() {
+    this.parts.forEach((part, pi) => {
+      let prevMeasure;
+      let key;
 
+      part.getMeasures().forEach((measure, mi) => {
+        let keyUpdated = false;
+
+        if (measure.getKey()) {
+          key = measure.getKey();
+          keyUpdated = true;
+        }
+
+        if (mi === 0 || measure.isNewLineStarting() || keyUpdated) {
+          measure.getStaves().forEach(stave => {
+            const vfKey = getVFKeySignature(key);
+            if (key) stave.addKeySignature(vfKey);
+          })
+        }
+
+        if (measure.isNewLineStarting() && keyUpdated) {
+          prevMeasure.getStaves().forEach(stave => {
+            // TODO: Apply after current PR for vexflow merged.
+            //const vfKey = getVFKeySignature(key);
+            //if (key) stave.addEndKeySignature(vfKey);
+          });
+        }
+
+        prevMeasure = measure;
+      });
+    });
   }
 
   formatTimeSignature() {
     this.parts.forEach((part, pi) => {
       //const numStaffs = part.getNumStaffs();
-      const measures = part.getMeasures();
       let prevMeasure;
       let time;
 
-      measures.forEach((measure, mi) => {
+      part.getMeasures().forEach((measure, mi) => {
         let timeUpdated = false;
 
         if (measure.getTime()) {
@@ -285,7 +313,6 @@ export default class Formatter {
 
         if (measure.isNewLineStarting() && timeUpdated) {
           prevMeasure.getStaves().forEach(stave => {
-            stave.setEndBarType(Vex.Flow.Barline.type.NONE);
             stave.addEndTimeSignature(`${time.beats}/${time.beatType}`);
           });
         }
@@ -301,7 +328,7 @@ export default class Formatter {
     this.formatY();
     this.createStaves();
     this.formatClef();
-    this.formatTimeSignature();
     this.formatKeySignature();
+    this.formatTimeSignature();
   }
 }
