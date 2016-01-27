@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import Concerto from '../src/index';
 
 const urls = [
@@ -19,10 +18,16 @@ function load(url) {
     element.removeChild(element.firstChild);
   }
 
-  $.ajax({
-    url: url,
-    dataType: 'text',
-    success: data => {
+  const req = new XMLHttpRequest();
+  req.open('GET', url, true);
+  req.onreadystatechange = () => {
+    if (req.readyState !== 4) return;
+    else if (req.readyState === 4 && req.status !== 200) {
+      console.error('Error loading musicxml', req.status);
+      return;
+    }
+
+    const data = req.responseText;
       const domParser = new DOMParser();
       const doc = domParser.parseFromString(data, 'application/xml');
       const score = Concerto.parse(doc);
@@ -36,8 +41,9 @@ function load(url) {
       console.log('renderer created');
       renderer.render();
       console.log('draw complete');
-    },
-  });
+  };
+
+  req.send(null);
 }
 
 const selectNode = document.getElementById('select');
