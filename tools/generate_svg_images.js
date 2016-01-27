@@ -1,29 +1,15 @@
 const fs = require('fs');
-const path = require('path');
-const process = require('process');
-const Vex = require('vexflow');
-const jsdom = require('jsdom').jsdom;
-const xmldom = require('xmldom');
-const Concerto = require('../build/concerto-node');
-
-window = jsdom().defaultView;
-document = window.document;
-
-const filenames = fs.readdirSync('./tests').filter(
+const Concerto = require('../build/concerto');
+const path = './build/images';
+const element = document.createElement('div');
+const filenames = fs.list('./tests').filter(
   function(filename) { return /.xml$/.test(filename); }
 );
-const dirExists = fs.readdirSync('./build').filter(
-  function(filename) { return /^images$/.test(filename); }
-).length > 0;
 
-if (!dirExists) fs.mkdirSync('./build/images');
-
-const element = document.createElement("div");
-
+fs.makeDirectory(path);
 filenames.forEach(function(filename) {
-  const data = fs.readFileSync('./tests/' + filename, 'utf8');
-
-  const domParser = new xmldom.DOMParser();
+  const data = fs.read('./tests/' + filename);
+  const domParser = new DOMParser();
   const doc = domParser.parseFromString(data, 'application/xml');
   const score = Concerto.parse(doc);
   const formatter = new Concerto.Formatter(score);
@@ -33,16 +19,12 @@ filenames.forEach(function(filename) {
   renderer.render();
 
   filename = filename.split(/.xml$/)[0];
-  console.log('filename', filename);
+  console.log(filename);
 
   renderer.getContexts().forEach(function(context, i) {
-    const svgData = new xmldom.XMLSerializer().serializeToString(context.svg);
-
-    try {
-      fs.writeFileSync('./build/images/' + filename + '_' + i + '.svg', svgData);
-    } catch(e) {
-      console.log("Can't save file: " + filename + ". Error: " + e);
-      process.exit(-1);
-    }
+    const svgData = new XMLSerializer().serializeToString(context.svg);
+    fs.write(path + '/' + filename + '_' + i + '.svg', svgData, 'w');
   });
 });
+
+slimer.exit();
