@@ -167,7 +167,6 @@ const parseNote = (data, noteNode, state) => {
     grace: isGrace,
     pitches: [],
     beams: [],
-    rest: isRest,
     staff: staff,
     voice: voice,
     dot: numDots,
