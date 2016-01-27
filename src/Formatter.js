@@ -305,7 +305,7 @@ export default class Formatter {
           timeUpdated = true;
         }
 
-        if (mi === 0 || measure.isNewLineStarting() || timeUpdated) {
+        if (mi === 0 || timeUpdated) {
           measure.getStaves().forEach(stave => {
             if (time) stave.addTimeSignature(`${time.beats}/${time.beatType}`);
           });
