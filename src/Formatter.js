@@ -9,10 +9,22 @@ export default class Formatter {
   constructor(score) {
     this.score = score;
     this.defaults = this.score.getDefaults();
+    this.credits = this.score.getCredits();
     this.parts = this.score.getParts();
     this.partList = this.score.getPartList();
+    this.context = this.createContext();
+  }
 
-    this.resetState();
+  createContext() {
+    // Fake context for using measureText function
+    const div = document.createElement('div');
+    div.style.width = '1px';
+    div.style.height = '1px';
+    div.style.opacity = 0;
+    div.style.zIndex = -1;
+    document.getElementsByTagName('body')[0].appendChild(div);
+
+    return Vex.Flow.Renderer.getSVGContext(div, 100, 100);
   }
 
   resetState() {
@@ -322,6 +334,76 @@ export default class Formatter {
     });
   }
 
+  formatCredits() {
+    const getTextAnchor = value => {
+      switch (value) {
+        case 'left': return 'start';
+        case 'right': return 'end';
+        case 'center': return 'middle';
+      }
+    };
+
+    const getDominantBaseline = value => {
+      switch (value) {
+        case 'top': return 'hanging';
+        case 'middle': return 'middle';
+        case 'bottom':
+        case 'baseline': return 'alphabetical';
+      }
+    };
+
+    const pageSize = this.score.getDefaults().getPageSize();
+    // words.fontSize = Number(/(\d+)\w*/.exec(node.getAttribute('font-size')[1]));
+    this.credits.forEach(credit => {
+      const texts = [];
+      let x;
+      let y;
+      let fontSize;
+      let textAnchor = 'hanging'; // TODO: full justify & halign support
+      let baseline = 'start';
+
+      credit.getWordsList().forEach(words => {
+        if (!/\w+/.test(words.content)) return; // ignore empty line-break
+
+        const text = {
+          content: words.content,
+          attributes: new Map(),
+        };
+
+        if (words.defaultX !== undefined) x = words.defaultX;
+        if (words.defaultY !== undefined) y = pageSize.height - words.defaultY;
+        if (words.justify !== undefined) textAnchor = getTextAnchor(words.justify);
+        if (words.halign !== undefined) textAnchor = getTextAnchor(words.halign);
+        if (words.valign !== undefined) baseline = getDominantBaseline(words.valign);
+
+        if (textAnchor) text.attributes.set('text-anchor', textAnchor);
+        if (baseline) text.attributes.set('dominant-baseline', baseline);
+
+        this.context.save();
+        if (words.fontSize !== undefined) {
+          fontSize = words.fontSize;
+          if (/\d+$/.test(fontSize)) {
+            fontSize = Number(fontSize) * 2.5; // TODO
+            fontSize += 'px';
+          }
+
+          text.attributes.set('font-size', fontSize);
+          this.context.attributes['font-size'] = fontSize; // svgcontext only
+        }
+
+        const bbox = this.context.measureText(text.content);
+        this.context.restore();
+
+        text.x = x;
+        text.y = y;
+        texts.push(text);
+        y += bbox.height;
+      });
+
+      credit.setTexts(texts);
+    });
+  }
+
   format() {
     this.resetState();
     this.formatX();
@@ -330,5 +412,6 @@ export default class Formatter {
     this.formatClef();
     this.formatKeySignature();
     this.formatTimeSignature();
+    this.formatCredits();
   }
 }

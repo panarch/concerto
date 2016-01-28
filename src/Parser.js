@@ -7,6 +7,7 @@ import Score from './Score';
 import Movement from './Movement';
 import Identification from './Identification';
 import Defaults from './Defaults';
+import Credit from './Credit';
 import PartList from './PartList';
 
 const parseMovement = scorePartwise => {
@@ -72,6 +73,29 @@ const parseDefaults = defaultsNode => {
     data.systemLayout = parseSystemLayout(systemLayoutNode);
 
   return new Defaults(data);
+};
+
+const parseCredit = creditNode => {
+  const typeNode = creditNode.getElementsByTagName('credit-type')[0];
+  const data = {
+    page: creditNode.hasAttribute('page') ? Number(creditNode.getAttribute('page')) : 1,
+  };
+
+  if (typeNode) data.type = typeNode.textContent;
+
+  data.wordsList = [...creditNode.getElementsByTagName('credit-words')].map(node => {
+    const words = { content: node.textContent };
+    if (node.hasAttribute('justify')) words.justify = node.getAttribute('justify');
+    if (node.hasAttribute('default-x')) words.defaultX = Number(node.getAttribute('default-x'));
+    if (node.hasAttribute('default-y')) words.defaultY = Number(node.getAttribute('default-y'));
+    if (node.hasAttribute('halign')) words.halign = node.getAttribute('halign');
+    if (node.hasAttribute('valign')) words.valign = node.getAttribute('valign');
+    if (node.hasAttribute('font-size')) words.fontSize = node.getAttribute('font-size');
+
+    return words;
+  });
+
+  return new Credit(data);
 };
 
 const parsePartList = partListNode => {
@@ -148,6 +172,10 @@ const parsePartList = partListNode => {
   });
 };
 
+const parseCredits = creditNodes => {
+  return creditNodes.map(node => parseCredit(node));
+};
+
 const parseParts = partNodes => {
   return partNodes.map(node => parsePart(node));
 };
@@ -160,15 +188,17 @@ export const parse = (doc) => {
     scorePartwise.getElementsByTagName('identification')[0]
   );
   const defaults = parseDefaults(scorePartwise.getElementsByTagName('defaults')[0]);
+  const credits = parseCredits([...scorePartwise.getElementsByTagName('credit')]);
   const partList = parsePartList(scorePartwise.getElementsByTagName('part-list')[0]);
   const parts = parseParts([...scorePartwise.getElementsByTagName('part')]);
 
   return new Score({
-    version: version,
-    movement: movement,
-    identification: identification,
-    defaults: defaults,
-    partList: partList,
-    parts: parts,
+    version,
+    movement,
+    identification,
+    defaults,
+    credits,
+    partList,
+    parts,
   });
 };

@@ -8,17 +8,18 @@ export default class Renderer {
     this.score = score;
     this.element = element;
     this.numPages = score.getNumPages();
+    this.pageSize = this.score.getDefaults().getPageSize();
     this.contexts = [];
   }
 
   getContexts() { return this.contexts; }
 
   setupRenderers() {
-    const pageSize = this.score.getDefaults().getPageSize();
+    const { width, height } = this.pageSize;
 
     this.contexts = [];
     for (let i = 0; i < this.numPages; i++) {
-      const context = Vex.Flow.Renderer.getSVGContext(this.element, pageSize.width, pageSize.height);
+      const context = Vex.Flow.Renderer.getSVGContext(this.element, width, height);
       this.contexts.push(context);
     }
   }
@@ -145,10 +146,24 @@ export default class Renderer {
     }
   }
 
+  renderCredits() {
+    this.score.getCredits().forEach(credit => {
+      const context = this.contexts[credit.getPage() - 1];
+
+      credit.getTexts().forEach(({ content, x, y, attributes }) => {
+        context.save();
+        attributes.forEach((value, key) => context.attributes[key] = value);
+        context.fillText(content, x, y);
+        context.restore();
+      });
+    });
+  }
+
   render() {
     this.setupRenderers();
     this.renderStaves();
-    this.renderStaveConnectors();
+    this.renderStaveConnectors(); // TODO: dividing formatting and renderering required
+    this.renderCredits();
   }
 
   static getVexConnectorType(groupSymbol) {

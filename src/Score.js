@@ -2,12 +2,13 @@
 // @author Taehoon Moon
 
 export default class Score {
-  constructor({ version, movement, identification, defaults, partList, parts }) {
+  constructor({ version, movement, identification, defaults, credits, partList, parts }) {
     this.formatted = false;
     this.version = version;
     this.movement = movement;
     this.identification = identification;
     this.defaults = defaults;
+    this.credits = credits;
     this.partList = partList;
     this.parts = parts;
   }
@@ -16,6 +17,7 @@ export default class Score {
   getMovement() { return this.movement; }
   getIdentification() { return this.identification; }
   getDefaults() { return this.defaults; }
+  getCredits() { return this.credits; }
   getPartList() { return this.partList; }
   getParts() { return this.parts; }
 
