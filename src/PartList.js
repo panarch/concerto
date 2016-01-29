@@ -6,8 +6,14 @@ export default class PartList {
     this.id = id;
     this.scoreParts = scoreParts;
     this.partGroups = partGroups;
+
+    // formatted
+    this.connectors = [];
   }
 
   getScoreParts() { return this.scoreParts; }
   getPartGroups() { return this.partGroups; }
+
+  getConnectors() { return this.connectors; }
+  setConenctors(connectors) { this.connectors = connectors; }
 }

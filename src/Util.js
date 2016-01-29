@@ -41,3 +41,20 @@ export const getVFKeySignature = keySig => {
 
   return vfKey;
 };
+
+export const getVFConnectorType = groupSymbol => {
+  let connectorType;
+  switch (groupSymbol) {
+    case 'brace':
+      connectorType = Vex.Flow.StaveConnector.type.BRACE;
+      break;
+    case 'bracket':
+      connectorType = Vex.Flow.StaveConnector.type.BRACKET;
+      break;
+      case 'line':
+    default:
+      connectorType = Vex.Flow.StaveConnector.type.DOUBLE;
+  }
+
+  return connectorType;
+};

@@ -3,7 +3,11 @@
 
 import Vex from 'vexflow';
 import Measure from './Measure';
-import { getVFClef, getVFKeySignature } from './Util';
+import {
+  getVFClef,
+  getVFKeySignature,
+  getVFConnectorType,
+} from './Util';
 
 export default class Formatter {
   constructor(score) {
@@ -404,6 +408,107 @@ export default class Formatter {
     });
   }
 
+  formatPartList() {
+    const partGroups = this.partList.getPartGroups();
+    const numMeasures = this.parts[0].getMeasures().length;
+    const connectors = [];
+
+    const findTopStave = (pi, mi, max) => {
+      for (; pi < max; pi++) {
+        const staves = this.parts[pi].getMeasures()[mi].getStaves();
+        if (staves && staves.length > 0)
+          return staves[0];
+
+      }
+    };
+
+    const findBottomStave = (pi, mi, min) => {
+      for (; pi > min; pi--) {
+        const staves = this.parts[pi].getMeasures()[mi].getStaves();
+        if (staves && staves.length > 0)
+          return staves[staves.length - 1];
+
+      }
+    };
+
+    let page = 1;
+
+    for (let mi = 0; mi < numMeasures; mi++) {
+      const firstPartMeasure = this.parts[0].getMeasures()[mi];
+      const isNewLineStarting = mi === 0 || firstPartMeasure.isNewLineStarting();
+      if (firstPartMeasure.hasNewPage()) page++;
+
+      if (isNewLineStarting) {
+        const topStave = findTopStave(0, mi, this.parts.length - 1);
+        const bottomStave = findBottomStave(this.parts.length - 1, mi, 0);
+        if (topStave && bottomStave) {
+          const staveConnector = new Vex.Flow.StaveConnector(topStave, bottomStave);
+          staveConnector.setType(Vex.Flow.StaveConnector.type.SINGLE_LEFT);
+          connectors.push({ page, staveConnector });
+        }
+      }
+
+      partGroups.forEach(partGroup => {
+        const { startPartIndex, stopPartIndex } = partGroup;
+        let topStave = findTopStave(startPartIndex, mi, stopPartIndex);
+        let bottomStave = findBottomStave(stopPartIndex, mi, startPartIndex);
+        if (!topStave || !bottomStave) {
+          if (partGroup.groupSymbol !== 'bracket' || !isNewLineStarting) return;
+
+          topStave = findTopStave(startPartIndex, mi, stopPartIndex + 1);
+          bottomStave = findBottomStave(stopPartIndex, mi, startPartIndex - 1);
+          if (!topStave || !bottomStave) return;
+
+          const staveConnector = new Vex.Flow.StaveConnector(topStave, bottomStave);
+          staveConnector.setType(Vex.Flow.StaveConnector.type.BRACKET);
+          connectors.push({ page, staveConnector });
+          return;
+        }
+
+        if (partGroup.groupBarline) {
+          const staveConnector = new Vex.Flow.StaveConnector(topStave, bottomStave);
+          staveConnector.setType(Vex.Flow.StaveConnector.type.SINGLE_RIGHT);
+          connectors.push({ page, staveConnector });
+        }
+
+        if (!isNewLineStarting) return;
+
+        if (partGroup.groupSymbol) {
+          const staveConnector = new Vex.Flow.StaveConnector(topStave, bottomStave);
+          const connectorType = getVFConnectorType(partGroup.groupSymbol);
+          staveConnector.setType(connectorType);
+          staveConnector.setXShift(0);
+          connectors.push({ page, staveConnector });
+        }
+      });
+
+      // single part && multiple-staff
+      this.parts.forEach(part => {
+        const staves = part.getMeasures()[mi].getStaves();
+        if (!staves || staves.length === 1) return;
+
+        const [topStave, bottomStave] = [staves[0], staves[staves.length - 1]];
+        if (!topStave || !bottomStave) return;
+
+        if (isNewLineStarting) {
+          let staveConnector = new Vex.Flow.StaveConnector(topStave, bottomStave);
+          staveConnector.setType(Vex.Flow.StaveConnector.type.BRACE);
+          connectors.push({ page, staveConnector });
+
+          staveConnector = new Vex.Flow.StaveConnector(topStave, bottomStave);
+          staveConnector.setType(Vex.Flow.StaveConnector.type.SINGLE_LEFT);
+          connectors.push({ page, staveConnector });
+        }
+
+        const staveConnector = new Vex.Flow.StaveConnector(topStave, bottomStave);
+        staveConnector.setType(Vex.Flow.StaveConnector.type.SINGLE_RIGHT);
+        connectors.push({ page, staveConnector });
+      });
+    }
+
+    this.partList.setConenctors(connectors);
+  }
+
   format() {
     this.resetState();
     this.formatX();
@@ -413,5 +518,6 @@ export default class Formatter {
     this.formatKeySignature();
     this.formatTimeSignature();
     this.formatCredits();
+    this.formatPartList();
   }
 }
