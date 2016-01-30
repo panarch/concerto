@@ -15,5 +15,5 @@ export default class PartList {
   getPartGroups() { return this.partGroups; }
 
   getConnectors() { return this.connectors; }
-  setConenctors(connectors) { this.connectors = connectors; }
+  setConnectors(connectors) { this.connectors = connectors; }
 }

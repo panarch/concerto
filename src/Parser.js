@@ -101,30 +101,29 @@ const parseCredit = creditNode => {
 const parsePartList = partListNode => {
   const scoreParts = [...partListNode.getElementsByTagName('score-part')].map(node => {
     const scoreInstNode = node.getElementsByTagName('score-instrument')[0];
+    const partNameNode = node.getElementsByTagName('part-name')[0];
+    const partAbbreviationNode = node.getElementsByTagName('part-abbreviation')[0];
     const midiInstNode = node.getElementsByTagName('midi-instrument')[0];
     const volumeNode = midiInstNode.getElementsByTagName('volume')[0];
     const panNode = midiInstNode.getElementsByTagName('pan')[0];
-
-    const midiInstrument = {
-      id: midiInstNode.getAttribute('id'),
-      midiChannel: Number(midiInstNode.getElementsByTagName('midi-channel')[0].textContent),
-      midiProgram: Number(midiInstNode.getElementsByTagName('midi-program')[0].textContent),
-    };
-
-    if (volumeNode)
-      midiInstrument.volume = Number(volumeNode.textContent);
-
-    if (panNode)
-      midiInstrument.pan = Number(panNode.textContent);
-
-    return {
-      partName: node.getElementsByTagName('part-name')[0].textContent,
+    const scorePart = {
+      midiInstrument: {
+        id: midiInstNode.getAttribute('id'),
+        midiChannel: Number(midiInstNode.getElementsByTagName('midi-channel')[0].textContent),
+        midiProgram: Number(midiInstNode.getElementsByTagName('midi-program')[0].textContent),
+      },
       scoreInstrument: {
         id: scoreInstNode.getAttribute('id'),
         instrumentName: scoreInstNode.getElementsByTagName('instrument-name')[0].textContent,
       },
-      midiInstrument: midiInstrument,
-    };
+    }
+
+    if (volumeNode) scorePart.midiInstrument.volume = Number(volumeNode.textContent);
+    if (panNode) scorePart.midiInstrument.pan = Number(panNode.textContent);
+    if (partNameNode) scorePart.partName = partNameNode.textContent;
+    if (partAbbreviationNode) scorePart.partAbbreviation = partAbbreviationNode.textContent;
+
+    return scorePart;
   });
 
   const partGroups = [];
@@ -144,6 +143,7 @@ const parsePartList = partListNode => {
 
       const groupSymbolNode = node.getElementsByTagName('group-symbol')[0];
       const groupNameNode = node.getElementsByTagName('group-name')[0];
+      const groupAbbreviationNode = node.getElementsByTagName('group-abbreviation')[0];
       const groupBarlineNode = node.getElementsByTagName('group-barline')[0];
       const partGroup = {
         number: number,
@@ -155,6 +155,9 @@ const parsePartList = partListNode => {
 
       if (groupNameNode)
         partGroup.groupName = groupNameNode.textContent;
+
+      if (groupAbbreviationNode)
+        partGroup.groupAbbreviation = groupAbbreviationNode.textContent;
 
       if (groupBarlineNode)
         partGroup.groupBarline = groupBarlineNode.textContent === 'yes';
