@@ -226,6 +226,7 @@ export default class Formatter {
 
           if (printMeasure.isStaffDisplayed(staff)) {
             const stave = new Vex.Flow.Stave(x, y, width, options);
+            stave.setBegBarType(Vex.Flow.Barline.type.NONE);
             measure.setStave(staff, stave);
           }
         }
