@@ -233,6 +233,23 @@ export default class Formatter {
     });
   }
 
+  formatMeasureNumber() {
+    let measureNumbering = 'system'; // default value
+
+    this.parts[0].getMeasures().forEach((measure, mi) => {
+      const print = measure.getPrint();
+      if (print && print.measureNumbering) measureNumbering = print.measureNumbering;
+
+      const topStave = measure.getStaves()[0];
+      if (!topStave) return;
+
+      if (measureNumbering === 'measure' ||
+          (measureNumbering === 'system' && measure.isNewLineStarting())) {
+        topStave.setMeasure(mi + 1);
+      }
+    });
+  }
+
   formatClef() {
     this.parts.forEach((part, pi) => {
       const clefMap = new Map(); // {staff}
@@ -566,6 +583,7 @@ export default class Formatter {
     this.formatX();
     this.formatY();
     this.createStaves();
+    this.formatMeasureNumber();
     this.formatClef();
     this.formatKeySignature();
     this.formatTimeSignature();

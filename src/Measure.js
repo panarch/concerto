@@ -26,6 +26,7 @@ export default class Measure {
     this.staffDisplayedMap = new Map();
   }
 
+  getPrint() { return this.print; }
   hasPrint() {
     return this.print ? true : false;
   }
