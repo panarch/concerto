@@ -413,6 +413,10 @@ export default class Formatter {
           this.context.attributes['font-size'] = fontSize; // svgcontext only
         }
 
+        // default font: "times", no custom font support
+        text.attributes.set('font-family', 'times');
+        this.context.attributes['font-family'] = 'times';
+
         const bbox = this.context.measureText(text.content);
         this.context.restore();
 
